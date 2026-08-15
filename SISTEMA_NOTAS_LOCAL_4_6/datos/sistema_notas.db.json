@@ -1,0 +1,148 @@
+{
+  "version": 13,
+  "nextNoteId": 3,
+  "nextPhotoId": 1,
+  "nextAuditId": 13,
+  "notes": [],
+  "photos": null,
+  "audit": [
+    {
+      "id": 1,
+      "action": "INICIAR_SERVIDOR",
+      "details": {
+        "pc": "DESKTOP-KH651TR",
+        "puerto": 8765,
+        "usuarioSO": "DESKTOP-KH651TR\\moises",
+        "version": "4.6.0-buscador-resultados-sin-select"
+      },
+      "createdAt": "2026-08-15T15:03:43-06:00"
+    },
+    {
+      "id": 2,
+      "action": "INICIAR_SERVIDOR",
+      "details": {
+        "pc": "DESKTOP-KH651TR",
+        "puerto": 8765,
+        "usuarioSO": "DESKTOP-KH651TR\\moises",
+        "version": "4.6.0-buscador-resultados-sin-select"
+      },
+      "createdAt": "2026-08-15T15:04:09-06:00"
+    },
+    {
+      "id": 3,
+      "action": "CREAR_NOTA",
+      "noteId": 1,
+      "folio": "REF/20260815/05569",
+      "details": {
+        "corporacion": "GEP",
+        "ip": "127.0.0.1",
+        "operador": "SUPERVISOR8"
+      },
+      "createdAt": "2026-08-15T15:04:43-06:00"
+    },
+    {
+      "id": 4,
+      "action": "ABRIR_NOTA",
+      "noteId": 1,
+      "folio": "REF/20260815/05569",
+      "details": {
+        "ip": "127.0.0.1",
+        "operador": "SUPERVISOR8"
+      },
+      "createdAt": "2026-08-15T15:04:43-06:00"
+    },
+    {
+      "id": 5,
+      "action": "CERRAR_INCIDENTE",
+      "noteId": 1,
+      "folio": "REF/20260815/05569",
+      "details": {
+        "codigo": "5",
+        "ip": "192.168.1.66",
+        "nombre": "PERSONA DETENIDA EN SITIO/FLAGRANCIA Y PUESTA A DISPOSICIÓN DEL M.P.",
+        "operador": "DESPACHADOR12"
+      },
+      "createdAt": "2026-08-15T15:05:07-06:00"
+    },
+    {
+      "id": 6,
+      "action": "CREAR_NOTA",
+      "noteId": 2,
+      "folio": "REF/20260815/05570",
+      "details": {
+        "corporacion": "TRVM",
+        "ip": "127.0.0.1",
+        "operador": "SUPERVISOR8"
+      },
+      "createdAt": "2026-08-15T15:05:30-06:00"
+    },
+    {
+      "id": 7,
+      "action": "ABRIR_NOTA",
+      "noteId": 2,
+      "folio": "REF/20260815/05570",
+      "details": {
+        "ip": "127.0.0.1",
+        "operador": "SUPERVISOR8"
+      },
+      "createdAt": "2026-08-15T15:05:30-06:00"
+    },
+    {
+      "id": 8,
+      "action": "CERRAR_INCIDENTE",
+      "noteId": 2,
+      "folio": "REF/20260815/05570",
+      "details": {
+        "codigo": "42",
+        "ip": "192.168.1.66",
+        "nombre": "VEHÍCULO REMITIDO",
+        "operador": "DESPACHADOR12"
+      },
+      "createdAt": "2026-08-15T15:06:00-06:00"
+    },
+    {
+      "id": 9,
+      "action": "ELIMINAR_NOTA",
+      "noteId": 2,
+      "folio": "REF/20260815/05570",
+      "details": {
+        "ip": "192.168.1.66",
+        "operador": "DESPACHADOR12"
+      },
+      "createdAt": "2026-08-15T15:06:07-06:00"
+    },
+    {
+      "id": 10,
+      "action": "ELIMINAR_NOTA",
+      "noteId": 1,
+      "folio": "REF/20260815/05569",
+      "details": {
+        "ip": "192.168.1.66",
+        "operador": "DESPACHADOR12"
+      },
+      "createdAt": "2026-08-15T15:06:09-06:00"
+    },
+    {
+      "id": 11,
+      "action": "INICIAR_SERVIDOR",
+      "details": {
+        "pc": "DESKTOP-KH651TR",
+        "puerto": 8765,
+        "usuarioSO": "DESKTOP-KH651TR\\moises",
+        "version": "4.6.0-buscador-resultados-sin-select"
+      },
+      "createdAt": "2026-08-15T15:44:42-06:00"
+    },
+    {
+      "id": 12,
+      "action": "INICIAR_SERVIDOR",
+      "details": {
+        "pc": "DESKTOP-KH651TR",
+        "puerto": 8765,
+        "usuarioSO": "DESKTOP-KH651TR\\moises",
+        "version": "4.6.0-buscador-resultados-sin-select"
+      },
+      "createdAt": "2026-08-15T16:34:31-06:00"
+    }
+  ]
+}

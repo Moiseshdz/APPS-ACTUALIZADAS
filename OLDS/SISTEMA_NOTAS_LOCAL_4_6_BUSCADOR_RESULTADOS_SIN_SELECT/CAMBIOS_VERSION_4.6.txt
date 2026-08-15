@@ -1,0 +1,12 @@
+SISTEMA DE NOTAS INFORMATIVAS 4.6
+
+CAMBIO SOLICITADO:
+- Se eliminó por completo el SELECT del Código de cierre.
+- Ahora el cierre usa un buscador con resultados visibles debajo.
+- Busca por número, nombre y definición completa.
+- Cada resultado es seleccionable con un clic.
+- El código seleccionado se muestra en una tarjeta independiente y puede quitarse con X.
+- Si el detector tiene CONFIANZA ALTA, el código recomendado queda seleccionado automáticamente.
+- Enter selecciona cuando la búsqueda deja un solo resultado.
+- Esc limpia búsqueda/selección.
+- No se modificó la carpeta de datos ni el modelo de almacenamiento.

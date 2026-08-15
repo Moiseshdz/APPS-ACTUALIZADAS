@@ -1,0 +1,22 @@
+SISTEMA DE NOTAS INFORMATIVAS - VERSION 4.4
+
+CAMBIO SOLICITADO:
+- Se modifico UNICAMENTE el selector "Codigo de cierre" del modal "Cerrar incidente".
+- Se agrego un buscador encima del selector para localizar rapidamente los 65 codigos.
+- El buscador acepta:
+  * Numero de codigo, por ejemplo: 23
+  * Nombre del cierre, por ejemplo: PERSONA DETENIDA
+  * Palabras contenidas en la definicion, por ejemplo: CORRALON, FISCALIA, ATENCION, RESCATE.
+- Mientras se escribe, el SELECT se filtra y muestra solo las coincidencias.
+- ENTER selecciona automaticamente cuando solo queda un resultado.
+- ESC limpia la busqueda.
+- El boton X nativo del campo de busqueda vuelve a mostrar los 65 codigos.
+
+NO SE MODIFICO:
+- Motor de deteccion de codigos de cierre.
+- 65 definiciones de cierre.
+- 282 tipificaciones.
+- Base local y carpeta datos.
+- Fotografias.
+- Ortografia.
+- Perfiles de corporaciones.

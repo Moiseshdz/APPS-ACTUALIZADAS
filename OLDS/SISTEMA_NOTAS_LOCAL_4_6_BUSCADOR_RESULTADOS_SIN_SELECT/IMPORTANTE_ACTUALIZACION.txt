@@ -1,0 +1,10 @@
+ACTUALIZACIÓN 4.3
+
+1. Cierra cualquier copia anterior del Sistema de Notas.
+2. En la computadora principal conserva tu carpeta datos.
+3. Reemplaza únicamente SistemaNotas.exe.
+4. Ejecuta el nuevo SistemaNotas.exe directamente.
+
+IMPORTANTE: NO reemplaces datos/sistema_notas.db.json ni datos/uploads si ya tienes información real.
+
+La versión 4.3 conserva la misma base local y añade el motor de códigos de cierre basado en las 65 definiciones para todas las corporaciones.

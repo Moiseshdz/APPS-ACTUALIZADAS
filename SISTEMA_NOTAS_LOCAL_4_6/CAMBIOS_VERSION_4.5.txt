@@ -1,0 +1,9 @@
+SISTEMA DE NOTAS INFORMATIVAS - VERSION 4.5
+
+CAMBIO SOLICITADO
+- Cuando el analisis de codigo de cierre devuelve CONFIANZA ALTA y existe un codigo recomendado, el sistema selecciona automaticamente ese codigo en el campo Codigo de cierre.
+- Ya no es necesario pulsar "Usar codigo" en casos de confianza alta.
+- El usuario puede cambiar manualmente el codigo seleccionado antes de cerrar.
+- En confianza MEDIA el boton "Usar codigo" se conserva para revision humana.
+- En confianza BAJA no se selecciona ningun codigo automaticamente.
+- No se modifico el motor de definiciones, catalogos, ortografia, datos ni fotografias.

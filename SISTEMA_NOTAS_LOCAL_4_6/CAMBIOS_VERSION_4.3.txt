@@ -1,0 +1,28 @@
+SISTEMA DE NOTAS INFORMATIVAS 4.3
+MOTOR DE CIERRE POR DEFINICIONES PARA TODAS LAS CORPORACIONES
+
+OBJETIVO
+El detector usa las definiciones de los 65 códigos de cierre como reglas maestras de significado. No exige que la nota copie literalmente el nombre o la definición del código.
+
+CAMBIOS
+- 65/65 códigos representados por escenarios semánticos.
+- Cada escenario evalúa sujeto, acción, resultado, destino, causa, contexto y contradicciones.
+- Vocabulario ampliado con equivalencias operativas para todas las corporaciones.
+- P.M. y M.P. se mantienen diferenciados.
+- Vehículo, carro, auto, camioneta, moto y otras variantes se interpretan por contexto.
+- Detenido, asegurado, arrestado, capturado y expresiones equivalentes se normalizan como detención cuando hablan de una persona.
+- Atención/valoración/traslado/hospital se combinan para distinguir 17, 18, 25, 35, 46, 47 y 48.
+- Incendio, pastizal, basura, propietario/vecinos y extinción/control se combinan para distinguir 21, 75, 76 y 77.
+- Se distinguen unidad no llegó, falta de unidades, falta de combustible y concentración por orden superior.
+- Se distinguen reportante no localizado, persona ofendida no localizada y ausencia de indicio delictivo.
+- Se distinguen central bancaria, seguridad privada, SEPROBAN y los medios llamada/grabación/aplicativo.
+- La corporación sirve como contexto/desempate y no como bloqueo rígido.
+- Las decisiones provenientes del motor por definición reciben prioridad sobre coincidencias estadísticas de palabras.
+- Cierre automático solo cuando la combinación es suficientemente específica y no hay contradicción.
+
+PRUEBAS
+- Matriz automática de 65 casos con redacciones alternativas: 65/65 aprobados.
+- Se mantienen las pruebas de Protección Civil, Seguridad Pública, Tránsito, puestas a disposición P.M./M.P., vehículos, ortografía y sincronización existentes.
+
+ACTUALIZACIÓN
+Conservar la carpeta datos y reemplazar únicamente SistemaNotas.exe.

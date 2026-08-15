@@ -1,0 +1,17 @@
+
+ABRIDOR DE ARCHIVOS - INSTRUCCIONES
+
+1. Extrae la carpeta completa.
+2. Abre: ABRIR_ARCHIVOS.cmd
+3. Pulsa "Agregar archivos".
+4. Selecciona los Word, Excel, PDF, carpetas, accesos directos u otros archivos que uses.
+5. La lista queda guardada en "archivos.json".
+6. La próxima vez solo abre ABRIR_ARCHIVOS.cmd y pulsa "ABRIR TODO".
+
+IMPORTANTE:
+- No requiere instalación.
+- No requiere permisos de administrador.
+- Los archivos se abren con el programa predeterminado de Windows.
+- Si mueves esta carpeta, la configuración sigue guardada.
+- Si mueves o renombras uno de los archivos seleccionados, tendrás que quitarlo y agregarlo de nuevo.
+- Algunas computadoras empresariales pueden bloquear PowerShell por política de seguridad.

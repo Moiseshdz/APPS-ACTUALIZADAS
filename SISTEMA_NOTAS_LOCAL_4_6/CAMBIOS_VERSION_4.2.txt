@@ -1,0 +1,13 @@
+SISTEMA DE NOTAS INFORMATIVAS 4.2
+DETECTOR GUIADO POR DEFINICIONES Y CONCEPTOS
+
+- Los 65 códigos de cierre siguen tomándose del catálogo closure_codes.json con sus definiciones completas.
+- La detección ya no exige frases exactas: normaliza conceptos operativos y sinónimos.
+- Ejemplos: vehículo/carro/auto/camioneta/moto; corralón/pensión/encierro; detenido/asegurado/arrestado/capturado; P.M. y M.P. se mantienen como destinos distintos.
+- Se añadieron relaciones por definición para VEHÍCULO REMITIDO (42), PERSONA FUGADA Y VEHÍCULO REMITIDO (54), PERSONA DETENIDA Y VEHÍCULO REMITIDO (55), y puestas a disposición P.M./M.P. (5, 23, 49, 74).
+- El motor compara los conceptos encontrados en la nota contra los conceptos presentes en la definición oficial de cada código y calcula cobertura semántica.
+- Una sola palabra no basta: se exige combinación de conceptos y se revisan contradicciones/contexto.
+- Las sugerencias semánticas sin una regla estructurada segura NO habilitan el cierre automático.
+- Se conservan servidor local, base local, ortografía, 282 tipificaciones, fotografías, supervisión y demás funciones previas.
+
+IMPORTANTE: al actualizar una instalación con datos reales, conservar la carpeta datos.

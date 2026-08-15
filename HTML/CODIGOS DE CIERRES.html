@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Códigos de Cierre</title>
+  <style>
+:root {
+  --yellow: #fff600;
+  --blue: #9ec2e4;
+  --line: #111111;
+  --paper: #ffffff;
+  --text: #101010;
+  --copy-bg: rgba(255,255,255,.94);
+  --copy-hover: #ffffff;
+  --blue-strong: #5f94c8;
+  --muted: #616161;
+  --surface: #f7f8fa;
+  --focus: #1e73be;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background: #f1f1f1;
+  color: var(--text);
+  font-family: Arial, "Arial Narrow", Helvetica, sans-serif;
+}
+
+body { padding: 16px; }
+
+.page-shell {
+  width: min(1500px, 100%);
+  margin: 0 auto;
+}
+
+.search-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 12px;
+  background: var(--paper);
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 3px 12px rgba(0,0,0,.08);
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  font-size: 18px;
+  pointer-events: none;
+}
+
+#searchInput {
+  width: 100%;
+  min-height: 48px;
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 10px 44px 10px 43px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+#searchInput:focus {
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px rgba(30,115,190,.15);
+}
+
+.clear-search {
+  position: absolute;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 20px;
+  font-weight: 900;
+  cursor: pointer;
+  display: none;
+}
+
+.clear-search.visible { display: block; }
+.clear-search:hover { background: #ececec; }
+
+.result-count {
+  min-width: 138px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  background: var(--yellow);
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.table-card {
+  background: var(--paper);
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 3px 14px rgba(0,0,0,.10);
+  overflow: hidden;
+}
+
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.closure-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background: var(--paper);
+}
+
+.closure-table th,
+.closure-table td {
+  border: 1.8px solid var(--line);
+}
+
+.closure-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--yellow);
+  color: #090909;
+  text-align: center;
+  font-size: clamp(18px, 2.15vw, 28px);
+  line-height: 1.05;
+  font-weight: 800;
+  padding: 20px 12px;
+}
+
+.code-head { width: 35%; }
+
+.code-cell {
+  background: var(--blue);
+  vertical-align: middle;
+  padding: 16px 14px;
+}
+
+.code-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.code-number {
+  flex: 0 0 auto;
+  min-width: 26px;
+  font-size: clamp(16px, 1.35vw, 22px);
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.code-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: clamp(15px, 1.3vw, 21px);
+  line-height: 1.25;
+  font-weight: 800;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.copy-btn {
+  margin-top: 12px;
+  border: 1.7px solid #111;
+  background: var(--copy-bg);
+  color: #111;
+  border-radius: 7px;
+  padding: 8px 11px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  cursor: pointer;
+  box-shadow: 0 1px 0 rgba(0,0,0,.12);
+  transition: transform .12s ease, background .12s ease, box-shadow .12s ease;
+}
+
+.copy-btn:hover {
+  background: var(--copy-hover);
+  box-shadow: 0 2px 0 rgba(0,0,0,.18);
+  transform: translateY(-1px);
+}
+
+.copy-btn:active { transform: translateY(0); }
+
+.definition-cell {
+  background: var(--paper);
+  padding: 18px 12px;
+  vertical-align: middle;
+  font-size: clamp(14px, 1.18vw, 19px);
+  line-height: 1.35;
+  font-weight: 500;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.closure-table tbody tr { transition: filter .12s ease; }
+.closure-table tbody tr:hover { filter: brightness(.985); }
+
+.no-results {
+  padding: 30px 16px !important;
+  text-align: center;
+  background: #fff !important;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translate(-50%, 16px);
+  background: #111;
+  color: #fff;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-weight: 800;
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease;
+  z-index: 9999;
+  box-shadow: 0 6px 22px rgba(0,0,0,.25);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+@media (max-width: 760px) {
+  body { padding: 7px; }
+  .search-panel {
+    grid-template-columns: 1fr;
+    padding: 8px;
+    border-width: 1.5px;
+  }
+  .result-count { min-width: 0; min-height: 40px; }
+  #searchInput { min-height: 46px; font-size: 15px; }
+  .table-card { border-width: 1px; border-radius: 8px; }
+  .closure-table { min-width: 760px; }
+  .closure-table thead th { padding: 16px 8px; }
+  .code-cell { padding: 13px 10px; }
+  .definition-cell { padding: 14px 10px; }
+}
+
+@media print {
+  body { background: #fff; padding: 0; }
+  .table-card { border: 0; box-shadow: none; }
+  .copy-btn, .toast, .search-panel { display: none !important; }
+  .closure-table thead th { position: static; }
+}
+
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="search-panel" aria-label="Buscador de códigos de cierre">
+      <div class="search-box">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <input id="searchInput" type="search" autocomplete="off" placeholder="BUSCAR POR NÚMERO, CÓDIGO O DEFINICIÓN..." aria-label="Buscar código de cierre">
+        <button id="clearSearch" class="clear-search" type="button" aria-label="Limpiar búsqueda">×</button>
+      </div>
+      <div id="resultCount" class="result-count" aria-live="polite"></div>
+    </section>
+
+    <section class="table-card" aria-label="Códigos de cierre">
+      <div class="table-wrap">
+        <table class="closure-table">
+          <thead>
+            <tr>
+              <th class="code-head">CODIGO DE CIERRE</th>
+              <th>DEFINICION</th>
+            </tr>
+          </thead>
+          <tbody id="codesBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script>
+const closureCodes = [
+  {
+    code: 2,
+    title: "HECHO FALSO",
+    definition: "DE ACUERDO A LAS ÚLTIMAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO EN EL LUGAR NO HAY INDICIOS SOBRE LA EMERGENCIA QUE REPORTAN EN EL LUGAR."
+  },
+  {
+    code: 4,
+    title: "APOYO A LA CIUDADANÍA",
+    definition: "DE ACUERDO A LAS ÚLTIMAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA CORPORACIÓN BRINDA UN APOYO A LA CIUDADANÍA O ES MEDIADOR PARA RESOLVER SU EMERGENCIA."
+  },
+  {
+    code: 5,
+    title: "PERSONA DETENIDA EN SITO/FLAGRANCIA Y PUESTA A DISPOSICIÓN DEL M.P",
+    definition: "DE ACUERDO A LAS ÚLTIMAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA CORPORACIÓN REALIZA LA DETENCIÓN DEL RESPONSABLE EN EL MOMENTO QUE SUCEDE Y SE PONE A DISPOSICIÓN DEL M.P."
+  },
+  {
+    code: 6,
+    title: "AMONESTACIÓN VERBAL",
+    definition: "DE ACUERDO A LAS ÚLTIMAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA CORPORACIÓN ÚNICAMENTE HACE UN LLAMADO DE ATENCIÓN AL RESPONSABLE Y TODO QUEDA SIN NOVEDAD."
+  },
+  {
+    code: 7,
+    title: "APOYO PREVENTIVO",
+    definition: "DE ACUERDO A LAS ÚLTIMAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO ACUDE LA UNIDAD PARA CUIDAR LA SEGURIDAD SOBRE ALGUNA SITUACIÓN QUE REPORTAN Y PUEDA CONVERTIRSE EN UNA EMERGENCIA O PONE EN PELIGRO LA INTEGRIDAD O PATRIMONIO DE LAS PERSONAS."
+  },
+  {
+    code: 8,
+    title: "EL DOMICILIO NO EXISTE O ES INCORRECTO",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO EL REPORTANTE NO BRINDA UNA DIRECCIÓN COMPLETA O QUE ESTA INCORRECTA; ES DECIR NO EXISTE."
+  },
+  {
+    code: 13,
+    title: "SE INFORMA A LA CORPORACIÓN",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO REPORTAN QUEJAS, TAMBIÉN CUANDO SE NOTIFICA A ALGUNA CORPORACIÓN PARA SU CONOCIMIENTO Y SEGUIMIENTO DE LA EMERGENCIA REPORTADA."
+  },
+  {
+    code: 15,
+    title: "FUGA DEL RESPONSABLE",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO REPORTAN QUE EL RESPONSABLE SE DA A LA FUGA."
+  },
+  {
+    code: 16,
+    title: "DELINCUENTE MUERTO EN PERSECUCIÓN",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO REPORTAN QUE EL RESPONSABLE AL MOMENTO DE LA FUGA FALLECE."
+  },
+  {
+    code: 17,
+    title: "ATENCIÓN MÉDICA EN SITIO",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA UNIDAD MÉDICA ATIENDE O VALORA A LA PERSONA AFECTADA EN EL LUGAR DE LA EMERGENCIA."
+  },
+  {
+    code: 18,
+    title: "ATENCIÓN MÉDICA EN INSTITUCIÓN DE SALUD",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA PERSONA AFECTADA ES ATENDIDA EN UNA INSTITUCIÓN DE SALUD."
+  },
+  {
+    code: 19,
+    title: "MUERTO EN SITIO",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA PERSONA AFECTADA MUERE EN EL LUGAR DE LA EMERGENCIA."
+  },
+  {
+    code: 20,
+    title: "CIERRE DE FUGA",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO AL ACUDIR LA CORPORACIÓN ERRADICA LA FUGA O DERRAMES DE GAS O SUSTANCIA QUE REPORTEN."
+  },
+  {
+    code: 21,
+    title: "EXTINCIÓN DE FUEGO",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO AL ACUDIR LA CORPORACIÓN ERRADICA EL FUEGO."
+  },
+  {
+    code: 22,
+    title: "APOYO ENTRE CORPORACIÓNES",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO SE EFECTÚA UNA COORDINACIÓN DE VARIAS CORPORACIÓNES PARA ATENDER EL LLAMADO DE AUXILIO, POR MENCIONAR POLICÍA MUNICIPAL, TRÁNSITO, BOMBEROS O UNIDAD MÉDICA DE ACUERDO AL TIPO DE EMERGENCIA QUE REPORTEN."
+  },
+  {
+    code: 23,
+    title: "PERSONA DETENIDA EN SITIO/FLAGRANCIA Y PUESTA A DISPOSICIÓN DE LA P.M.",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA UNIDAD REALIZA LA DETENCIÓN DEL RESPONSABLE EN EL MOMENTO DE LOS HECHOS Y ES PUESTO A DISPOSICIÓN DE LA P.M."
+  },
+  {
+    code: 24,
+    title: "SIMULACRO",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO SOLICITAN EL APOYO PARA UN SIMULACRO O PRUEBAS DE UN LLAMADO DE SISMOS, INCENDIOS, DERRAMES, QUEMADURAS, ETC."
+  },
+  {
+    code: 25,
+    title: "PERSONA SE NEGO A LA ATENCIÓN",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA PERSONA AFECTADA SE NIEGA A SER VALORADA O ATENDIDA EN EL LUGAR DE LA EMERGENCIA PRINCIPALMENTE POR UNA UNIDAD MÉDICA."
+  },
+  {
+    code: 26,
+    title: "TRASLADO A ALBERGUE",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA PERSONA AFECTADA ES TRASLADADA A UN ALBERGUE O INSTANCIA PARA SU CUIDADO Y PROTECCIÓN."
+  },
+  {
+    code: 27,
+    title: "TRASLADO A SEMEFO",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA PERSONA OCCISA ES TRASLADADA AL SEMEFO."
+  },
+  {
+    code: 28,
+    title: "UNIDAD NO LLEGO",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA UNIDAD NO ACUDE AL LUGAR; ASÍ MISMO NO SE TIENE ALGÚN TIPO DE COMUNICACIÓN CON LA CORPORACIÓN QUE COMPETE."
+  },
+  {
+    code: 29,
+    title: "ORIENTACIÓN/INFORMACIÓN",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA UNIDAD QUE LLEGA AL LUGAR, ÚNICAMENTE DA ORIENTACIÓN O INFORMACIÓN DE ACUDIR A UNA FISCALÍA O RECOMENDACIONES PARA LA PARTE AFECTADA, GENERALMENTE EL RESPONSABLE YA NO ESTA EN EL LUGAR."
+  },
+  {
+    code: 30,
+    title: "RESCATE",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA CORPORACIÓN QUE ACUDE AL LUGAR REALIZA EL RESCATE DE UNA PERSONA O ANIMAL QUE REPORTEN QUE ESTA ATRAPADO."
+  },
+  {
+    code: 32,
+    title: "INCIDENTE CANCELADO POR EL CIUDADANO",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO A PETICIÓN DEL REPORTANTE MANIFIESTA QUE SE CANCELE EL APOYO DE LA UNIDAD AL LUGAR DE LA EMERGENCIA."
+  },
+  {
+    code: 34,
+    title: "TRASLADO DE PERSONA POR PARTICULAR",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO EL REPORTANTE MANIFIESTA QUE TRASLADARA A LA PARTE AFECTADA POR SUS PROPIOS MEDIOS."
+  },
+  {
+    code: 35,
+    title: "TRASLADO A INSTITUCIÓN DE SALUD Y ATENCION EN SITIO",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA UNIDAD MÉDICA ATIENDE O VALORA A LA PARTE AFECTADA EN EL LUGAR DE LA EMERGENCIA Y POSTERIOR ES TRASLADADA A UNA INSTITUCIÓN DE SALUD."
+  },
+  {
+    code: 36,
+    title: "INCIDENTE NO ATENDIDO POR FALTA DE UNIDADES",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA CORPORACIÓN NO ACUDE AL LUGAR POR FALTA DE UNIDADES."
+  },
+  {
+    code: 37,
+    title: "TRASLADO A INSTITUCIÓN DE SALUD Y MUERTO EN SITIO",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA PARTE AFECTADA ES TRASLADADA A UNA INSTITUCIÓN DE SALUD Y POSTERIOR MUERE EN EL LUGAR."
+  },
+  {
+    code: 38,
+    title: "CONSIGNA",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO GENERALMENTE QUEDA UN INCIDENTE EN PANTALLA Y DEBE SER MONITOREADO PARA SU SEGUIMIENTO CORRESPONDIENTE DE LAS CORPORACIÓNES, POR MENCIONAR ALGUNOS EJEMPLOS: MITÍN, CONCENTRACIÓN PACIFICA DE PERSONAS ETC, LOS CUALES SE LIBERAN HASTA QUE CONCLUYA EL APOYO EN EL LUGAR DE LA EMERGENCIA."
+  },
+  {
+    code: 39,
+    title: "CONVENIO",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LLEGA LA UNIDAD EN EL LUGAR DE LA EMERGENCIA Y LAS PARTES INVOLUCRADAS LLEGAN A UN CONVENIO."
+  },
+  {
+    code: 40,
+    title: "EVACUACIÓN",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO EN SITUACIONES COMO: INCENDIOS, DERRUMBES, SISMOS, ACCIDENTES LAS CORPORACIÓNES QUE ACUDEN EN EL LUGAR REALIZAN LA EVACUACIÓN DE LAS PERSONAS QUE SE ENCUENTRAN EN EL LUGAR DE LA EMERGENCIA."
+  },
+  {
+    code: 41,
+    title: "VEHÍCULO RECUPERADO",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO POSTERIOR A QUE REPORTEN UNA EMERGENCIA DE ROBO DE VEHÍCULO PARTICULAR EL REPORTANTE MANIFIESTE QUE SE ENCONTRÓ SU VEHÍCULO EN OTRO LUGAR."
+  },
+  {
+    code: 42,
+    title: "VEHÍCULO REMITIDO",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO EL VEHÍCULO INVOLUCRADO EN UN ACCIDENTE O EN UNA FALTA DE TRÁNSITO ES REMITIDO A UN CORRALÓN."
+  },
+  {
+    code: 43,
+    title: "NO SE HIZO CONTACTO CON EL INCIDENTE",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA UNIDAD QUE LLEGA AL LUGAR DE LA EMERGENCIA NO ENCUENTRA A LA PARTE REPORTANTE O NO SALIÓ A CONTACTAR."
+  },
+  {
+    code: 44,
+    title: "ASESORÍA MÉDICA",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO EL OPERADOR INTERVINIENTE O PERSONAL DE CORPORACIÓN MÉDICA A TRAVÉS DE LA LINEA TELEFÓNICA BRINDA ASISTENCÍA DE PRIMEROS AUXILIOS."
+  },
+  {
+    code: 45,
+    title: "EJECUCIÓN DE ORDEN DE APREHENSIÓN",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO SE TRATA DE UNA EJECUCIÓN DE ORDEN DE APREHENSIÓN DE UNA FISCALIA."
+  },
+  {
+    code: 46,
+    title: "TRASLADO A INSTITUCIÓN DE SALUD",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA UNIDAD MÉDICA REALIZA EL TRASLADO DE LA PERSONA LESIONADA A UNA INSTITUCIÓN DE SALUD."
+  },
+  {
+    code: 47,
+    title: "MUERTO EN TRASLADO",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA UNIDAD MÉDICA REALIZA EL TRASLADO Y LA PARTE AFECTADA FALLECE."
+  },
+  {
+    code: 48,
+    title: "MUERTO EN INSTITUCIÓN DE SALUD",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA UNIDAD MÉDICA REALIZA EL TRASLADO Y LA PARTE AFECTADA FALLECE DENTRO DE LA INSTITUCIÓN DE SALUD."
+  },
+  {
+    code: 49,
+    title: "PERSONA DETENIDA EN FUGA Y PUESTA A DISPOSICIÓN DE LA P.M",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA UNIDAD POLICIACA QUE ACUDE AL LUGAR DE LA EMERGENCIA REALIZA LA DETECCIÓN DEL RESPONSABLE EN EL MOMENTO QUE SE DABA A LA FUGA Y ES PUESTO A DISPOCISIÓN DE LA P.M."
+  },
+  {
+    code: 52,
+    title: "CANALIZACIÓN A INSTANCIA COMPETENTE",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO SE NOTIFICA O INFORMA A LA CORPORACIÓN QUE ES DE SU COMPETENCIA PARA QUE LE DE EL SEGUIMIENTO POSTERIOR A LO QUE REPORTAN POR MENCIONAR EJEMPLOS: VEHÍCULOS ABANDONADOS, ENJAMBRES, TALA ILEGAL, FALLAS DE SEMÁFORO, DERRUMBES ETC."
+  },
+  {
+    code: 53,
+    title: "EJECUCIÓN DE ORDEN DE CATEO",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA FISCALIA NOTIFICA A C5 QUE SE TRATA DE UNA ORDEN DE CATEO O DILIGENCIA."
+  },
+  {
+    code: 54,
+    title: "PERSONA FUGADA Y VEHÍCULO REMITIDO",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO EN EL LUGAR DE LA EMERGENCIA EL RESPONSABLE SE DA A LA FUGA DEJANDO SU VEHÍCULO EN EL LUGAR DE LOS HECHOS, POR LO CÚAL EL VEHÍCULO ES REMITIDO A LA FISCALIA O CORRALÓN."
+  },
+  {
+    code: 55,
+    title: "PERSONA DETENIDA Y VEHÍCULO REMITIDO",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO EN EL LUGAR DE LA EMERGENCIA EL RESPONSABLE ES DETENIDO DEJANDO Y EL VEHÍCULO INVOLUCRADO ES REMITIDO A LA FISCALIA O CORRALÓN."
+  },
+  {
+    code: 56,
+    title: "SE ELABORÓ TARJETA DE INFRACCIÓN",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO EN EL LUGAR DE LA EMERGENCIA LA UNIDAD QUE ACUDE ELABORA TARJETA DE INFRACCIÓN POR UNA FALTA ADMINISTRATIVA."
+  },
+  {
+    code: 57,
+    title: "LOS CONDUCTORES DE CADA VEHÍCULO SE RESPONSABILIZAN DE SUS DAÑOS",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO DERIVADO DE UN PERCANCE O ACCIDENTE CADA UNA DE LAS PARTES INVOLUCRADAS SE RESPONSABILIZAN DE SUS DAÑOS OCASIONADOS (LA UNIDAD DE TRÁNSITO INTERVIENE PARA EL ARREGLO)."
+  },
+  {
+    code: 58,
+    title: "NO INTERVIENE EL AGENTE DE TRÁNSITO (ARREGLO ENTRE PARTICULARES)",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO DERIVADO DE UN PERCANCE O ACCIDENTE LAS PARTES INVOLUCRADAS LLEGAN A UN ARREGLO POR SU CUENTA (LA UNIDAD DE TRÁNSITO NO INTERVIENE)."
+  },
+  {
+    code: 59,
+    title: "LAS ASEGURADORAS SE RESPONZABILIZAN",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO DERIVADO DE UN PERCANCE O ACCIDENTE LAS ASEGURADORAS SE RESPONSABILIZAN DE LOS DAÑOS OCASIONADOS."
+  },
+  {
+    code: 60,
+    title: "PERSONA LOCALIZADA",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO EL REPORTANTE MANIFIESTA QUE LA PERSONA QUE ESTABA EN CARÁCTER DE DESAPARECIDA YA FUE ENCONTRADA."
+  },
+  {
+    code: 63,
+    title: "ALARMA ACTIVADA (SEGURIDAD PRIVADA)",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA ACTIVACIÓN DE ALARMA PROVIENE DE UNA CASA PARTICULAR, NEGOCIO PARTICULAR O CASA DE EMPEÑO QUE TENGA CONTRATADO UN SERVICIO DE SEGURIDAD PRIVADA."
+  },
+  {
+    code: 64,
+    title: "CENTRAL DE ALARMAS BANCOS (LLAMADA)",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA ACTIVACIÓN DE ALARMA PROVIENE DE UN BANCO Y ES A TRAVÉS DE UNA LLAMADA DE UN OPERADOR TELEFÓNICO."
+  },
+  {
+    code: 65,
+    title: "CENTRAL DE ALARMAS BANCOS (GRABACION)",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA ACTIVACIÓN DE ALARMA PROVIENE DE UN BANCO Y ES A TRAVÉS DE GRABADORA DE AUDIOS O COMNUTADOR."
+  },
+  {
+    code: 66,
+    title: "SEPROBAN (GRABACION)",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA ACTIVACIÓN DE ALARMA DE UN BANCO PROVIENE DIRECTAMENTE DE SEPROBAN (POR MEDIO DE UNA GRABACION)."
+  },
+  {
+    code: 67,
+    title: "SEPROBAN (LLAMADA)",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA ACTIVACIÓN DE ALARMA DE UN BANCO PROVIENE DIRECTAMENTE DE SEPROBAN (POR MEDIO DE UNA LLAMADA)."
+  },
+  {
+    code: 68,
+    title: "SEPROBAN (APLICATIVO)",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA ACTIVACIÓN DE ALARMA DE UN BANCO PROVIENE DIRECTAMENTE DE SEPROBAN MEDIANTE UN APLICATIVO."
+  },
+  {
+    code: 69,
+    title: "UNIDAD LLEGO Y NO LOCALIZO A LA PERSONA OFENDIDA",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA UNIDAD LLEGA AL LUGAR DE LA EMERGENCIA Y NO UBICA O LOCALIZA A LA PARTE AFECTADA U OFENDIDA."
+  },
+  {
+    code: 70,
+    title: "UNIDAD LLEGO, VERIFICÓ Y NO ENCONTRO INDICIO DELICTIVO",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA UNIDAD LLEGA AL LUGAR DE LA EMERGENCIA, VERIFICA Y NO ENCONTRO INDICIOS SOBRE EL ACTO DELICTIVO QUE REPORTARÓN A LA LINEA DE EMERGENCIA."
+  },
+  {
+    code: 71,
+    title: "UNIDAD LLEGO, POR FALTA DE COMBUSTIBLE",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LA UNIDAD NO LLEGA AL LUGAR POR FALTA DE GASOLINA O COMBUSTIBLE."
+  },
+  {
+    code: 73,
+    title: "UNIDADES CONCENTRADAS POR ORDEN SUPERIOR",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LAS UNIDADES SE ENCUENTRAS CONCENTRADAS EN UN EVENTO, CUMPLIENDO UNA ORDEN O ESTAN EN SU BASE POR ORDENES SUPERIORES."
+  },
+  {
+    code: 74,
+    title: "PERSONA DETENIDA EN FUGA Y PUESTA A DISPOSICIÓN DEL M.P.",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO LAS UNIDADES REALIZAN LA DETECCIÓN DEL RESPONSABLE EN EL MOMENTO DE LA FUGA Y ES PUESTA A DISPOCISIÓN DEL M.P."
+  },
+  {
+    code: 75,
+    title: "INCENDIO CONTROLADO POR EL PROPIETARIO",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA EL INCENDIO REPORTADO ES CONTROLADO POR EL PROPIETARIO O CON LA AYUDA DE VECINOS."
+  },
+  {
+    code: 76,
+    title: "INCENDIO DE PASTIZAL CONTROLADO",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA EL INCENDIO DE PÁSTIZAL REPORTADO ES CONTROLADO."
+  },
+  {
+    code: 77,
+    title: "QUEMA DE BASURA",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO EL INCENDIO REPORTADO ERA BASURA Y QUEDA CONTROLADO."
+  },
+  {
+    code: 78,
+    title: "ACORDONAMIENTO PREVENTIVO",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO SE REALIZA UN ACORDONAMIENTO EN EL ÁREA PARA CUIDAR LA VIALIDAD Y SEGURIDAD DE LOS TRANSEUNTES QUE TRANSITAN POR EL LUGAR DE LA EMERGENCIA Y ASI EVITAR RIESGOS A LA POBLACIÓN."
+  },
+  {
+    code: 79,
+    title: "LABOR DE INTELIGENCIA",
+    definition: "DE ACUERDO A LAS NOTAS DEL INCIDENTE, SE EMPLEA CUANDO SE REALIZAN EN EL LUGAR INVESTIGACIONES Y LABORES DE INTELIGENCIA POR UN SEGUIMIENTO DE ACTOS DELICTIVOS."
+  }
+];
+
+const body = document.getElementById("codesBody");
+const toast = document.getElementById("toast");
+const searchInput = document.getElementById("searchInput");
+const clearSearch = document.getElementById("clearSearch");
+const resultCount = document.getElementById("resultCount");
+let toastTimer;
+
+function normalizeText(text) {
+  return String(text ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase();
+}
+
+function renderCodes(query = "") {
+  const term = normalizeText(query.trim());
+  const filtered = term
+    ? closureCodes.filter(item =>
+        normalizeText(item.code).includes(term) ||
+        normalizeText(item.title).includes(term) ||
+        normalizeText(item.definition).includes(term)
+      )
+    : closureCodes;
+
+  resultCount.textContent = `${filtered.length} DE ${closureCodes.length} CÓDIGOS`;
+  clearSearch.classList.toggle("visible", Boolean(query));
+
+  if (!filtered.length) {
+    body.innerHTML = `<tr><td colspan="2" class="no-results">NO SE ENCONTRARON CÓDIGOS CON ESA BÚSQUEDA.</td></tr>`;
+    return;
+  }
+
+  body.innerHTML = filtered.map(item => `
+    <tr>
+      <td class="code-cell">
+        <div class="code-main">
+          <span class="code-number">${item.code}</span>
+          <span class="code-title">${escapeHtml(item.title)}</span>
+        </div>
+        <button class="copy-btn" type="button" data-code="${item.code}" aria-label="Copiar ${escapeHtml(item.title)}">
+          COPIAR CÓDIGO DE CIERRE
+        </button>
+      </td>
+      <td class="definition-cell">${escapeHtml(item.definition)}</td>
+    </tr>
+  `).join("");
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+async function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const temp = document.createElement("textarea");
+  temp.value = text;
+  temp.setAttribute("readonly", "");
+  temp.style.position = "fixed";
+  temp.style.left = "-9999px";
+  document.body.appendChild(temp);
+  temp.select();
+  const ok = document.execCommand("copy");
+  temp.remove();
+  if (!ok) throw new Error("No se pudo copiar");
+}
+
+function showToast(message) {
+  clearTimeout(toastTimer);
+  toast.textContent = message;
+  toast.classList.add("show");
+  toastTimer = setTimeout(() => toast.classList.remove("show"), 1500);
+}
+
+body.addEventListener("click", async event => {
+  const button = event.target.closest(".copy-btn");
+  if (!button) return;
+
+  const code = Number(button.dataset.code);
+  const item = closureCodes.find(entry => entry.code === code);
+  if (!item) return;
+
+  const textToCopy = item.title;
+
+  try {
+    await copyText(textToCopy);
+    const original = button.textContent;
+    button.textContent = "COPIADO ✓";
+    showToast("CÓDIGO DE CIERRE COPIADO ✓");
+    setTimeout(() => { button.textContent = original; }, 1000);
+  } catch (error) {
+    showToast("No se pudo copiar");
+  }
+});
+
+searchInput.addEventListener("input", () => {
+  renderCodes(searchInput.value);
+});
+
+clearSearch.addEventListener("click", () => {
+  searchInput.value = "";
+  renderCodes();
+  searchInput.focus();
+});
+
+searchInput.addEventListener("keydown", event => {
+  if (event.key === "Escape") {
+    searchInput.value = "";
+    renderCodes();
+  }
+});
+
+renderCodes();
+
+  </script>
+</body>
+</html>

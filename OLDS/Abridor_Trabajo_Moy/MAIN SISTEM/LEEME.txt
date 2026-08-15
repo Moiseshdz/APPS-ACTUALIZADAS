@@ -1,0 +1,36 @@
+ABRIDOR DE TRABAJO - MOY
+========================
+
+ARCHIVO PRINCIPAL:
+  Abridor_Trabajo_Moy.exe
+
+NO USA:
+  - CMD
+  - BAT
+  - PowerShell
+  - Instalador
+
+FUNCIONES:
+  - Lista de accesos guardados.
+  - Doble clic para abrir un elemento.
+  - Botón AGREGAR ARCHIVO para escoger un archivo.
+  - Campo para pegar una ruta, carpeta o URL (https://...).
+  - Botón QUITAR para eliminar un acceso de la lista.
+  - Botón ABRIR SELECCIONADO.
+  - Botón ABRIR TODO.
+  - Guarda la lista en Abridor_Trabajo_Moy.txt.
+
+ACCESOS INICIALES:
+  1. CheckList PMI
+  2. Códigos de Cierre
+  3. FATIGA
+  4. Carpeta D:\Music\APPS-ACTUALIZACION
+
+IMPORTANTE:
+Este programa abre los elementos usando las funciones normales de Windows.
+No desactiva ni evita las políticas de seguridad de la computadora.
+Si la empresa bloquea un archivo, una página o ejecutables no autorizados,
+el programa no puede ni debe saltarse ese bloqueo. En ese caso TI debe autorizarlo.
+
+REQUISITO:
+  Windows de 64 bits (Windows 10/11 recomendado).

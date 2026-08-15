@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#075e54">
+<title>Turnado WhatsApp | Alarmas</title>
+<style>
+:root{
+  --bg:#eef3f5;--card:#fff;--text:#17242d;--muted:#70808b;--line:#dce5e8;
+  --c5:#0f766e;--c5-dark:#095d57;--wa:#25d366;--wa-dark:#1eaa52;
+  --shadow:0 15px 40px rgba(20,40,55,.10)
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:"Segoe UI",Arial,sans-serif;color:var(--text);
+background:radial-gradient(circle at top right,rgba(15,118,110,.11),transparent 500px),linear-gradient(180deg,#f8fbfc,#edf3f5)}
+body{padding:25px}
+.app{max-width:1200px;margin:auto}
+.header{margin-bottom:22px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.header-info small{display:block;font-size:12px;font-weight:800;letter-spacing:2px;color:var(--c5);margin-bottom:7px}
+.header-info h1{margin:0;font-size:clamp(30px,4vw,48px);line-height:1}
+.header-info p{margin:10px 0 0;color:var(--muted)}
+.status{white-space:nowrap;padding:10px 15px;background:#e9f9ef;color:#13823c;border:1px solid #ccefd7;border-radius:30px;font-size:12px;font-weight:800}
+.status:before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;background:#22c55e;margin-right:7px;box-shadow:0 0 0 5px rgba(34,197,94,.12)}
+.grid{display:grid;grid-template-columns:1.6fr .75fr;gap:20px}
+.card{background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:24px}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.title-group{display:flex;align-items:center;gap:12px}
+.step{width:35px;height:35px;display:grid;place-items:center;background:#e7f4f2;color:var(--c5);border-radius:10px;font-weight:900;font-size:12px}
+.card h2{margin:0;font-size:17px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field{display:flex;flex-direction:column;gap:7px}
+.field.full{grid-column:1/-1}
+label span{font-size:13px;font-weight:800;color:#465660}
+input,select,textarea{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:12px;outline:none;font-size:15px;color:var(--text);background:#fff;transition:.2s}
+input:focus,select:focus,textarea:focus{border-color:var(--c5);box-shadow:0 0 0 4px rgba(15,118,110,.10)}
+textarea{resize:vertical}
+small.help{color:var(--muted);font-size:12px}
+.whatsapp-card{position:sticky;top:20px}
+.actions{display:grid;gap:10px;margin-top:18px}
+button{border:none;cursor:pointer;font-family:inherit}
+.btn{padding:13px 16px;border-radius:12px;font-weight:900;transition:.15s}
+.btn:hover{transform:translateY(-1px)}
+.btn-whatsapp{background:var(--wa);color:#fff;box-shadow:0 10px 25px rgba(37,211,102,.20)}
+.btn-whatsapp:hover{background:var(--wa-dark)}
+.btn-copy{background:#e8f4f3;color:var(--c5-dark)}
+.btn-clear{padding:8px 12px;border-radius:9px;border:1px solid var(--line);background:#fff;color:var(--muted);font-weight:700}
+.note{margin-top:15px;background:#f6f9fa;border:1px dashed #cad6da;padding:13px;border-radius:12px;color:var(--muted);font-size:12px;line-height:1.5}
+.switch-line{margin-top:14px;display:flex;gap:10px;align-items:center;cursor:pointer;font-size:13px;color:var(--muted)}
+.switch-line input{display:none}
+.switch{width:42px;height:24px;background:#cbd5da;border-radius:30px;position:relative;transition:.2s}
+.switch:after{content:"";width:18px;height:18px;background:#fff;position:absolute;left:3px;top:3px;border-radius:50%;transition:.2s;box-shadow:0 2px 6px rgba(0,0,0,.18)}
+.switch-line input:checked+.switch{background:var(--c5)}
+.switch-line input:checked+.switch:after{transform:translateX(18px)}
+.preview{margin-top:20px}
+.message-box{min-height:210px;line-height:1.55;background:#fbfdfd;font-size:15px}
+.counter{font-size:12px;color:var(--muted)}
+.templates{margin-top:15px;display:flex;gap:8px;flex-wrap:wrap}
+.templates strong{font-size:11px;color:var(--muted);letter-spacing:1px;margin-right:3px;display:flex;align-items:center}
+.chip{padding:8px 12px;border:1px solid var(--line);background:#fff;color:#53636d;border-radius:30px;font-weight:700;font-size:12px}
+.chip:hover{background:#edf8f6;border-color:#9bc9c3;color:var(--c5)}
+.contacts{margin-top:17px;border-top:1px solid var(--line);padding-top:17px}
+.contacts-title{font-size:12px;font-weight:900;color:var(--muted);margin-bottom:10px}
+.contact-grid{display:grid;gap:8px}
+.contact-btn{width:100%;text-align:left;background:#f7fafb;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:#40505a;font-weight:700}
+.contact-btn:hover{background:#edf7f5;border-color:#afd6d1}
+.toast{position:fixed;right:22px;bottom:22px;background:#17252e;color:#fff;padding:13px 17px;border-radius:11px;box-shadow:0 15px 35px rgba(0,0,0,.25);opacity:0;transform:translateY(15px);pointer-events:none;transition:.2s;font-size:13px;z-index:1000}
+.toast.show{opacity:1;transform:translateY(0)}
+.hidden{display:none!important}
+footer{text-align:center;color:#87959e;font-size:11px;padding:20px}
+
+
+.coords-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.map-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn-map{background:#eef7f5;color:var(--c5-dark);border:1px solid #cbe4df}
+.btn-map:hover{background:#e2f2ef}
+@media(max-width:560px){.coords-row{grid-template-columns:1fr}}
+
+.directory-box{margin-top:18px;border-top:1px solid var(--line);padding-top:18px}
+.directory-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.directory-head strong{font-size:12px;letter-spacing:.06em;color:var(--muted)}
+.directory-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.directory-grid .full{grid-column:1/-1}
+.contact-status{margin-top:10px;padding:10px 12px;border-radius:10px;background:#f5f9fa;border:1px solid var(--line);font-size:12px;color:#53636d;line-height:1.45}
+.contact-status b{color:var(--c5-dark)}
+.btn-save-contact{background:var(--c5);color:white}
+.btn-save-contact:hover{background:var(--c5-dark)}
+.btn-use-contact{background:#eef7f5;color:var(--c5-dark);border:1px solid #cbe4df}
+@media(max-width:560px){.directory-grid{grid-template-columns:1fr}.directory-grid .full{grid-column:auto}}
+
+@media(max-width:850px){body{padding:15px}.header{flex-direction:column;align-items:flex-start}.grid{grid-template-columns:1fr}.whatsapp-card{position:static}}
+@media(max-width:560px){body{padding:9px}.card{padding:17px;border-radius:16px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.header-info h1{font-size:31px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="header-info">
+      <small>ESCUDO PAKAL C5 · 911 · REFORMA, CHIAPAS</small>
+      <h1>Turnado por WhatsApp</h1>
+      <p>Generador rápido de mensajes para reportes y activaciones de alarma.</p>
+    </div>
+    <div class="status">SISTEMA LISTO</div>
+  </header>
+
+  <div class="grid">
+    <section class="card">
+      <div class="card-header">
+        <div class="title-group"><div class="step">01</div><h2>Datos del reporte</h2></div>
+        <button id="btnLimpiar" class="btn-clear" type="button">Limpiar</button>
+      </div>
+
+      <div class="form-grid">
+        <label class="field">
+          <span>Destinatario</span>
+          <select id="corporacion">
+            <option value="COMANDO">COMANDO</option>
+            <option value="COMANDANTE">COMANDANTE</option>
+            <option value="SEGURIDAD PÚBLICA MUNICIPAL">SEGURIDAD PÚBLICA MUNICIPAL</option>
+            <option value="GUARDIA ESTATAL PREVENTIVA">GUARDIA ESTATAL PREVENTIVA</option>
+            <option value="TRÁNSITO MUNICIPAL">TRÁNSITO MUNICIPAL</option>
+            <option value="PROTECCIÓN CIVIL">PROTECCIÓN CIVIL</option>
+            <option value="OTRO">OTRO</option>
+          </select>
+        </label>
+
+        <label id="otroCorporacionWrap" class="field hidden">
+          <span>Destinatario personalizado</span>
+          <input id="otroCorporacion" type="text" placeholder="Ej. COMANDANTE DE TURNO">
+        </label>
+
+        <label class="field">
+          <span>Institución</span>
+          <select id="institucion">
+            <option value="BANCO DEL BIENESTAR">BANCO DEL BIENESTAR</option>
+            <option value="BANCO BIENESTAR">BANCO BIENESTAR</option>
+            <option value="OTRA">OTRA</option>
+          </select>
+        </label>
+
+        <label id="otraInstitucionWrap" class="field hidden">
+          <span>Institución personalizada</span>
+          <input id="otraInstitucion" placeholder="Nombre de la institución">
+        </label>
+
+        <label class="field">
+          <span>Municipio</span>
+          <select id="municipio">
+            <option value="REFORMA (SEDE)">REFORMA (SEDE)</option>
+            <option value="JUÁREZ">JUÁREZ</option>
+            <option value="PICHUCALCO">PICHUCALCO</option>
+            <option value="IXTAPANGAJOYA">IXTAPANGAJOYA</option>
+            <option value="SUNUAPA">SUNUAPA</option>
+            <option value="OSTUACÁN">OSTUACÁN</option>
+            <option value="CHAPULTENANGO">CHAPULTENANGO</option>
+            <option value="IXTACOMITÁN">IXTACOMITÁN</option>
+            <option value="SOLOSUCHIAPA">SOLOSUCHIAPA</option>
+            <option value="AMATÁN">AMATÁN</option>
+            <option value="IXHUATÁN">IXHUATÁN</option>
+            <option value="TAPILULA">TAPILULA</option>
+            <option value="RAYÓN">RAYÓN</option>
+            <option value="PANTEPEC">PANTEPEC</option>
+            <option value="TAPALAPA">TAPALAPA</option>
+            <option value="COAPILLA">COAPILLA</option>
+            <option value="OCOTEPEC">OCOTEPEC</option>
+            <option value="TECPATÁN">TECPATÁN</option>
+            <option value="MEZCALAPA">MEZCALAPA</option>
+            <option value="COPAINALÁ">COPAINALÁ</option>
+            <option value="CHICOASÉN">CHICOASÉN</option>
+            <option value="OSUMACINTA">OSUMACINTA</option>
+            <option value="SAN FERNANDO">SAN FERNANDO</option>
+            <option value="JITOTOL">JITOTOL</option>
+          </select>
+        </label>
+
+        <label class="field full">
+          <span>Dirección completa del Banco del Bienestar</span>
+          <textarea id="ubicacion" rows="2" placeholder="Ej. Calle, número, colonia, código postal, localidad y referencias del inmueble"></textarea>
+        </label>
+
+        <div class="field full">
+          <span>Coordenadas del lugar</span>
+          <div class="coords-row">
+            <input id="latitud" type="text" inputmode="decimal" placeholder="Latitud, ej. 17.850123">
+            <input id="longitud" type="text" inputmode="decimal" placeholder="Longitud, ej. -93.160456">
+          </div>
+          <small class="help">Puedes pegar las coordenadas directamente desde Google Maps.</small>
+        </div>
+
+        <div class="field full">
+          <div class="map-row">
+            <button id="btnAbrirMapa" class="btn btn-map" type="button">📍 ABRIR UBICACIÓN EN MAPS</button>
+            <button id="btnCopiarCoords" class="btn btn-copy" type="button">COPIAR COORDENADAS</button>
+          </div>
+        </div>
+
+        <label class="field">
+          <span>Tipo de alarma</span>
+          <select id="tipoAlarma">
+            <option value="ALARMA SILENCIOSA">ALARMA SILENCIOSA</option>
+            <option value="BOTÓN DE PÁNICO">BOTÓN DE PÁNICO</option>
+            <option value="ALARMA DE INTRUSIÓN">ALARMA DE INTRUSIÓN</option>
+            <option value="ALARMA GENERAL">ALARMA GENERAL</option>
+            <option value="OTRA">OTRA</option>
+          </select>
+        </label>
+
+        <label id="otraAlarmaWrap" class="field hidden">
+          <span>Tipo personalizado</span>
+          <input id="otraAlarma" placeholder="Escribe el tipo de alarma">
+        </label>
+
+        <label class="field full">
+          <span>Motivo de activación</span>
+          <select id="motivo">
+            <option value="PÉRDIDA DE COMUNICACIÓN">PÉRDIDA DE COMUNICACIÓN</option>
+            <option value="ACTIVACIÓN SIN CAUSA APARENTE">ACTIVACIÓN SIN CAUSA APARENTE</option>
+            <option value="POSIBLE INTRUSIÓN">POSIBLE INTRUSIÓN</option>
+            <option value="ACTIVACIÓN DE BOTÓN DE PÁNICO">ACTIVACIÓN DE BOTÓN DE PÁNICO</option>
+            <option value="OTRO">OTRO</option>
+          </select>
+        </label>
+
+        <label id="otroMotivoWrap" class="field full hidden">
+          <span>Motivo personalizado</span>
+          <input id="otroMotivo" placeholder="Escribe el motivo">
+        </label>
+
+        <label class="field">
+          <span>Folio</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="folioPrefijo" type="text" readonly style="max-width:175px;background:#f5f7f8;color:#52606a;font-weight:800">
+            <input id="folio" type="text" inputmode="numeric" placeholder="Ej. 18234">
+          </div>
+          <small class="help">Formato automático: REF/AAAAMMDD/NUMERO</small>
+        </label>
+
+        <label class="field">
+          <span>Hora del reporte</span>
+          <input id="hora" type="time">
+        </label>
+
+        <label class="field full">
+          <span>Observaciones</span>
+          <textarea id="observaciones" rows="3" placeholder="Información adicional del reporte"></textarea>
+        </label>
+      </div>
+    </section>
+
+    <aside class="card whatsapp-card">
+      <div class="card-header">
+        <div class="title-group"><div class="step">02</div><h2>WhatsApp</h2></div>
+      </div>
+
+      <label class="field">
+        <span>Contacto a utilizar</span>
+        <select id="tipoContacto">
+          <option value="base">BASE</option>
+          <option value="director">DIRECTOR</option>
+        </select>
+      </label>
+
+      <label class="field" style="margin-top:12px">
+        <span>Número de WhatsApp</span>
+        <input id="telefono" type="tel" inputmode="tel" placeholder="Se carga según el municipio">
+        <small class="help">Se carga automáticamente desde tu directorio del municipio seleccionado.</small>
+      </label>
+
+      <label class="switch-line">
+        <input id="guardarTelefono" type="checkbox" checked>
+        <span class="switch"></span>
+        Recordar número en esta computadora
+      </label>
+
+      <div class="actions">
+        <button id="btnWhatsapp" class="btn btn-whatsapp" type="button">☎ ENVIAR POR WHATSAPP</button>
+        <button id="btnCopiar" class="btn btn-copy" type="button">COPIAR MENSAJE</button>
+      </div>
+
+      <div class="note">
+        WhatsApp se abrirá con el mensaje listo. El envío final se realiza manualmente para que puedas revisar el reporte antes de mandarlo.
+      </div>
+
+      <div class="contacts">
+        <div class="contacts-title">NÚMEROS RÁPIDOS</div>
+        <div class="contact-grid">
+          <button class="contact-btn" type="button" data-phone="" data-name="Seguridad Pública">🚓 Seguridad Pública</button>
+          <button class="contact-btn" type="button" data-phone="" data-name="Guardia Estatal Preventiva">🛡 Guardia Estatal Preventiva</button>
+          <button class="contact-btn" type="button" data-phone="" data-name="Protección Civil">🚑 Protección Civil</button>
+          <button class="contact-btn" type="button" data-phone="" data-name="Tránsito Municipal">🚦 Tránsito Municipal</button>
+        </div>
+      </div>
+      <div class="directory-box">
+        <div class="directory-head">
+          <strong>DIRECTORIO DEL MUNICIPIO</strong>
+          <button id="btnNuevoContacto" class="btn-clear" type="button">Editar</button>
+        </div>
+
+        <div id="contactStatus" class="contact-status">
+          Selecciona un municipio para consultar sus contactos guardados.
+        </div>
+
+        <div id="directoryEditor" class="directory-grid hidden" style="margin-top:12px">
+          <label class="field full">
+            <span>Municipio</span>
+            <input id="dirMunicipio" type="text" readonly>
+          </label>
+
+          <label class="field">
+            <span>Nombre del Director</span>
+            <input id="dirDirectorNombre" type="text" placeholder="Ej. Cmdte. Juan Pérez">
+          </label>
+
+          <label class="field">
+            <span>WhatsApp Director</span>
+            <input id="dirDirectorTelefono" type="tel" inputmode="tel" placeholder="529931234567">
+          </label>
+
+          <label class="field">
+            <span>Nombre / referencia de Base</span>
+            <input id="dirBaseNombre" type="text" placeholder="Ej. Base Municipal">
+          </label>
+
+          <label class="field">
+            <span>WhatsApp Base</span>
+            <input id="dirBaseTelefono" type="tel" inputmode="tel" placeholder="529931234567">
+          </label>
+
+          <button id="btnGuardarContacto" class="btn btn-save-contact full" type="button">GUARDAR CONTACTOS</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <section class="card preview">
+    <div class="card-header">
+      <div class="title-group"><div class="step">03</div><h2>Vista previa del mensaje</h2></div>
+      <span id="contador" class="counter">0 caracteres</span>
+    </div>
+
+    <textarea id="mensaje" class="message-box" spellcheck="true"></textarea>
+
+    <div class="templates">
+      <strong>MENSAJES RÁPIDOS</strong>
+      <button class="chip" data-template="comunicacion" type="button">Pérdida de comunicación</button>
+      <button class="chip" data-template="panico" type="button">Botón de pánico</button>
+      <button class="chip" data-template="intrusion" type="button">Posible intrusión</button>
+      <button class="chip" data-template="general" type="button">Alarma general</button>
+    </div>
+  </section>
+
+  <footer>SISTEMA LOCAL · ESCUDO PAKAL C5 · 911 · REFORMA, CHIAPAS</footer>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const corporacion=$("corporacion"),otroCorporacion=$("otroCorporacion"),otroCorporacionWrap=$("otroCorporacionWrap");
+const institucion=$("institucion"),otraInstitucion=$("otraInstitucion"),otraInstitucionWrap=$("otraInstitucionWrap");
+const municipio=$("municipio"),ubicacion=$("ubicacion"),latitud=$("latitud"),longitud=$("longitud");
+const btnAbrirMapa=$("btnAbrirMapa"),btnCopiarCoords=$("btnCopiarCoords");
+const tipoAlarma=$("tipoAlarma"),otraAlarma=$("otraAlarma"),otraAlarmaWrap=$("otraAlarmaWrap");
+const motivo=$("motivo"),otroMotivo=$("otroMotivo"),otroMotivoWrap=$("otroMotivoWrap");
+const folio=$("folio"),folioPrefijo=$("folioPrefijo"),hora=$("hora"),observaciones=$("observaciones"),telefono=$("telefono");
+const guardarTelefono=$("guardarTelefono"),mensaje=$("mensaje"),contador=$("contador");
+const tipoContacto=$("tipoContacto"),contactStatus=$("contactStatus"),directoryEditor=$("directoryEditor");
+const btnNuevoContacto=$("btnNuevoContacto"),btnGuardarContacto=$("btnGuardarContacto");
+const dirMunicipio=$("dirMunicipio"),dirDirectorNombre=$("dirDirectorNombre"),dirDirectorTelefono=$("dirDirectorTelefono");
+const dirBaseNombre=$("dirBaseNombre"),dirBaseTelefono=$("dirBaseTelefono");
+const btnWhatsapp=$("btnWhatsapp"),btnCopiar=$("btnCopiar"),btnLimpiar=$("btnLimpiar"),toastBox=$("toast");
+
+function obtenerSaludo(){
+  const h=new Date().getHours();
+  if(h<12)return"BUENOS DÍAS";
+  if(h<19)return"BUENAS TARDES";
+  return"BUENAS NOCHES";
+}
+
+function obtenerFechaFolio(){
+  const d=new Date();
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,"0");
+  const day=String(d.getDate()).padStart(2,"0");
+  return `${y}${m}${day}`;
+}
+function actualizarPrefijoFolio(){
+  folioPrefijo.value=`REF/${obtenerFechaFolio()}/`;
+}
+function folioCompleto(){
+  const numero=(folio.value||"").replace(/\D/g,"");
+  return numero ? `REF/${obtenerFechaFolio()}/${numero}` : "";
+}
+function valorPersonalizado(select,input){
+  if(select.value==="OTRO"||select.value==="OTRA"){
+    const t=input.value.trim();
+    return t?t.toUpperCase():"SIN ESPECIFICAR";
+  }
+  return select.value;
+}
+function generarMensaje(){
+  const destinatario=valorPersonalizado(corporacion,otroCorporacion);
+  const nombreInstitucion=valorPersonalizado(institucion,otraInstitucion);
+  const alarma=valorPersonalizado(tipoAlarma,otraAlarma);
+  const detalle=valorPersonalizado(motivo,otroMotivo);
+  const municipioSeleccionado=municipio.value.replace(" (SEDE)","");
+  const ubicacionTexto=ubicacion.value.trim().toUpperCase();
+  const lat=latitud.value.trim();
+  const lon=longitud.value.trim();
+
+  let texto=`${obtenerSaludo()}, ${destinatario}. POR MEDIO DEL PRESENTE SE INFORMA QUE SE RECIBIÓ REPORTE POR ACTIVACIÓN DE ALARMA EN LAS INSTALACIONES DE ${nombreInstitucion}`;
+
+  if(ubicacionTexto){
+    texto+=`, UBICADO EN ${ubicacionTexto}, MUNICIPIO DE ${municipioSeleccionado}`;
+  }else{
+    texto+=`, UBICADO EN EL MUNICIPIO DE ${municipioSeleccionado}`;
+  }
+
+  texto+=`.`;
+
+  if(lat && lon){
+    texto+=`\n\nCOORDENADAS DEL INMUEBLE: ${lat}, ${lon}`;
+    texto+=`\nUBICACIÓN EN MAPS: https://www.google.com/maps?q=${encodeURIComponent(lat+","+lon)}`;
+  }
+
+  texto+=`\n\nDE ACUERDO CON LA INFORMACIÓN RECIBIDA, SE TRATA DE ${alarma}`;
+  if(detalle){
+    texto+=` DERIVADA DE ${detalle}`;
+  }
+
+  texto+=`, POR LO QUE SE SOLICITA SU VALIOSO APOYO PARA REALIZAR LA VERIFICACIÓN CORRESPONDIENTE EN EL LUGAR Y REPORTAR CUALQUIER NOVEDAD.`;
+
+  const folioActual=folioCompleto();
+
+  if(folioActual || hora.value){
+    texto+=`\n\n`;
+    if(folioActual){
+      texto+=`FOLIO DE REFERENCIA: ${folioActual}`;
+    }
+    if(folioActual && hora.value){
+      texto+=`\n`;
+    }
+    if(hora.value){
+      texto+=`HORA DEL REPORTE: ${hora.value} HRS`;
+    }
+  }
+
+  if(observaciones.value.trim()){
+    texto+=`\n\nOBSERVACIONES: ${observaciones.value.trim().toUpperCase()}`;
+  }
+
+  texto+=`\n\nQUEDAMOS PENDIENTES DE SU CONFIRMACIÓN Y DEL RESULTADO DE LA VERIFICACIÓN.`;
+
+  mensaje.value=texto;
+  actualizarContador();
+}
+
+function revisarCampos(){
+  otroCorporacionWrap.classList.toggle("hidden",corporacion.value!=="OTRO");
+  otraInstitucionWrap.classList.toggle("hidden",institucion.value!=="OTRA");
+  otraAlarmaWrap.classList.toggle("hidden",tipoAlarma.value!=="OTRA");
+  otroMotivoWrap.classList.toggle("hidden",motivo.value!=="OTRO");
+}
+function actualizarContador(){contador.textContent=`${mensaje.value.length} caracteres`}
+function mostrarToast(texto){
+  toastBox.textContent=texto;toastBox.classList.add("show");
+  clearTimeout(window.toastTimer);
+  window.toastTimer=setTimeout(()=>toastBox.classList.remove("show"),2200);
+}
+function limpiarTelefono(valor){return valor.replace(/\D/g,"")}
+
+function getDirectorio(){
+  try{return JSON.parse(localStorage.getItem("directorioMunicipiosC5")||"{}")}
+  catch(e){return{}}
+}
+function saveDirectorio(data){
+  localStorage.setItem("directorioMunicipiosC5",JSON.stringify(data));
+}
+function municipioClave(){
+  return municipio.value;
+}
+function municipioNombreLimpio(){
+  return municipio.value.replace(" (SEDE)","");
+}
+function cargarDirectorioMunicipio(){
+  const data=getDirectorio();
+  const item=data[municipioClave()]||{};
+  dirMunicipio.value=municipioNombreLimpio();
+  dirDirectorNombre.value=item.directorNombre||"";
+  dirDirectorTelefono.value=item.directorTelefono||"";
+  dirBaseNombre.value=item.baseNombre||"";
+  dirBaseTelefono.value=item.baseTelefono||"";
+  aplicarContactoMunicipio(false);
+  actualizarEstadoContacto();
+}
+function actualizarEstadoContacto(){
+  const data=getDirectorio();
+  const item=data[municipioClave()]||{};
+  const director=item.directorTelefono ? `${item.directorNombre||"Director"} · ${item.directorTelefono}` : "Sin número";
+  const base=item.baseTelefono ? `${item.baseNombre||"Base"} · ${item.baseTelefono}` : "Sin número";
+  contactStatus.innerHTML=`<b>${municipioNombreLimpio()}</b><br>Director: ${director}<br>Base: ${base}`;
+}
+function aplicarContactoMunicipio(mostrar=true){
+  const data=getDirectorio();
+  const item=data[municipioClave()]||{};
+  const tipo=tipoContacto.value;
+  const numero=tipo==="director" ? item.directorTelefono : item.baseTelefono;
+  const nombre=tipo==="director" ? item.directorNombre : item.baseNombre;
+
+  if(numero){
+    telefono.value=numero;
+    if(mostrar)mostrarToast(`${nombre||tipo.toUpperCase()} seleccionado`);
+  }else{
+    telefono.value="";
+    if(mostrar)mostrarToast(`No hay ${tipo==="director"?"Director":"Base"} guardado para ${municipioNombreLimpio()}`);
+  }
+  guardarConfig();
+}
+
+function guardarConfig(){
+  if(guardarTelefono.checked)localStorage.setItem("numeroWhatsappC5",limpiarTelefono(telefono.value));
+  else localStorage.removeItem("numeroWhatsappC5");
+  localStorage.setItem("configAlarmasC5",JSON.stringify({corporacion:corporacion.value,institucion:institucion.value,municipio:municipio.value,tipoContacto:tipoContacto.value}));
+}
+function cargarConfig(){
+  const num=localStorage.getItem("numeroWhatsappC5");
+  if(num)telefono.value=num;
+  try{
+    const conf=JSON.parse(localStorage.getItem("configAlarmasC5")||"{}");
+    if(conf.corporacion)corporacion.value=conf.corporacion;
+    if(conf.institucion)institucion.value=conf.institucion;
+    if(conf.municipio)municipio.value=conf.municipio;
+    if(conf.tipoContacto)tipoContacto.value=conf.tipoContacto;
+  }catch(e){}
+}
+function colocarHoraActual(){
+  const d=new Date(),h=String(d.getHours()).padStart(2,"0"),m=String(d.getMinutes()).padStart(2,"0");
+  hora.value=`${h}:${m}`;
+}
+function aplicarPlantilla(tipo){
+  if(tipo==="comunicacion"){tipoAlarma.value="ALARMA SILENCIOSA";motivo.value="PÉRDIDA DE COMUNICACIÓN";observaciones.value=""}
+  if(tipo==="panico"){tipoAlarma.value="BOTÓN DE PÁNICO";motivo.value="ACTIVACIÓN DE BOTÓN DE PÁNICO";observaciones.value="SE SOLICITA VERIFICACIÓN PRIORITARIA."}
+  if(tipo==="intrusion"){tipoAlarma.value="ALARMA DE INTRUSIÓN";motivo.value="POSIBLE INTRUSIÓN";observaciones.value="SE SOLICITA VERIFICAR EL INMUEBLE Y REPORTAR NOVEDADES."}
+  if(tipo==="general"){tipoAlarma.value="ALARMA GENERAL";motivo.value="ACTIVACIÓN SIN CAUSA APARENTE";observaciones.value=""}
+  revisarCampos();generarMensaje();mostrarToast("Plantilla aplicada");
+}
+function limpiarFormulario(){
+  ubicacion.value="";folio.value="";observaciones.value="";
+  tipoAlarma.value="ALARMA SILENCIOSA";motivo.value="PÉRDIDA DE COMUNICACIÓN";
+  otroCorporacion.value="";otraInstitucion.value="";otraAlarma.value="";otroMotivo.value="";
+  colocarHoraActual();revisarCampos();generarMensaje();mostrarToast("Formulario limpiado");
+}
+[
+  corporacion,otroCorporacion,institucion,otraInstitucion,municipio,ubicacion,latitud,longitud,tipoAlarma,otraAlarma,
+  motivo,otroMotivo,folio,hora,observaciones
+].forEach(campo=>{
+  campo.addEventListener("input",()=>{revisarCampos();generarMensaje();guardarConfig()});
+  campo.addEventListener("change",()=>{revisarCampos();generarMensaje();guardarConfig()});
+});
+folio.addEventListener("input",()=>{
+  folio.value=folio.value.replace(/\D/g,"");
+  actualizarPrefijoFolio();
+});
+telefono.addEventListener("input",guardarConfig);
+guardarTelefono.addEventListener("change",guardarConfig);
+mensaje.addEventListener("input",actualizarContador);
+btnLimpiar.addEventListener("click",limpiarFormulario);
+
+btnCopiar.addEventListener("click",async()=>{
+  const texto=mensaje.value.trim();
+  if(!texto)return mostrarToast("No hay mensaje para copiar");
+  try{await navigator.clipboard.writeText(texto);mostrarToast("Mensaje copiado")}
+  catch(e){mensaje.select();document.execCommand("copy");mostrarToast("Mensaje copiado")}
+});
+
+
+btnAbrirMapa.addEventListener("click",()=>{
+  const lat=latitud.value.trim();
+  const lon=longitud.value.trim();
+  if(!lat || !lon){
+    mostrarToast("Captura latitud y longitud");
+    return;
+  }
+  window.open(`https://www.google.com/maps?q=${encodeURIComponent(lat+","+lon)}`,"_blank");
+});
+
+btnCopiarCoords.addEventListener("click",async()=>{
+  const lat=latitud.value.trim();
+  const lon=longitud.value.trim();
+  if(!lat || !lon){
+    mostrarToast("Captura latitud y longitud");
+    return;
+  }
+  const texto=`${lat}, ${lon}`;
+  try{
+    await navigator.clipboard.writeText(texto);
+    mostrarToast("Coordenadas copiadas");
+  }catch(e){
+    mostrarToast("No se pudieron copiar");
+  }
+});
+
+btnWhatsapp.addEventListener("click",()=>{
+  const numero=limpiarTelefono(telefono.value),texto=mensaje.value.trim();
+  if(!numero){mostrarToast("Escribe el número de WhatsApp");telefono.focus();return}
+  if(numero.length<10){mostrarToast("Verifica el número");telefono.focus();return}
+  if(!texto){mostrarToast("No hay mensaje");return}
+  guardarConfig();
+  window.open("https://wa.me/"+numero+"?text="+encodeURIComponent(texto),"_blank");
+});
+
+document.querySelectorAll("[data-template]").forEach(b=>{
+  b.addEventListener("click",()=>aplicarPlantilla(b.dataset.template));
+});
+
+
+municipio.addEventListener("change",()=>{
+  cargarDirectorioMunicipio();
+  generarMensaje();
+  guardarConfig();
+});
+
+tipoContacto.addEventListener("change",()=>{
+  aplicarContactoMunicipio();
+  guardarConfig();
+});
+
+btnNuevoContacto.addEventListener("click",()=>{
+  directoryEditor.classList.toggle("hidden");
+  btnNuevoContacto.textContent=directoryEditor.classList.contains("hidden") ? "Editar" : "Cerrar";
+  if(!directoryEditor.classList.contains("hidden"))cargarDirectorioMunicipio();
+});
+
+btnGuardarContacto.addEventListener("click",()=>{
+  const data=getDirectorio();
+  data[municipioClave()]={
+    directorNombre:dirDirectorNombre.value.trim(),
+    directorTelefono:limpiarTelefono(dirDirectorTelefono.value),
+    baseNombre:dirBaseNombre.value.trim(),
+    baseTelefono:limpiarTelefono(dirBaseTelefono.value)
+  };
+  saveDirectorio(data);
+  actualizarEstadoContacto();
+  aplicarContactoMunicipio(false);
+  mostrarToast(`Contactos de ${municipioNombreLimpio()} guardados`);
+});
+
+document.querySelectorAll(".contact-btn").forEach(b=>{
+  b.addEventListener("click",()=>{
+    const numero=b.dataset.phone;
+    if(!numero){mostrarToast("Primero agrega el número de "+b.dataset.name+" dentro del código");return}
+    telefono.value=numero;guardarConfig();mostrarToast(b.dataset.name+" seleccionado");
+  });
+});
+
+cargarConfig();
+colocarHoraActual();
+actualizarPrefijoFolio();
+revisarCampos();
+cargarDirectorioMunicipio();
+generarMensaje();
+</script>
+</body>
+</html>
