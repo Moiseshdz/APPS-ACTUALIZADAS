@@ -7,6 +7,12 @@ on:
     paths:
       - '.chatlan_build/**'
       - '.github/workflows/chatlan-android-build.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.chatlan_build/**'
+      - '.github/workflows/chatlan-android-build.yml'
 
 permissions:
   contents: read
