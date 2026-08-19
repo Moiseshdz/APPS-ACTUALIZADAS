@@ -1,0 +1,90 @@
+name: ChatLAN Android v9 Build
+
+on:
+  push:
+    branches:
+      - chatlan-v9-build
+    paths:
+      - '.chatlan_build_v9/**'
+      - '.github/workflows/chatlan-android-v9-build.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.chatlan_build_v9/**'
+      - '.github/workflows/chatlan-android-v9-build.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Reconstruct project
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p chatlan
+          cat .chatlan_build_v9/p*.b64 | base64 -d > /tmp/chatlan-project.zip
+          unzip -q /tmp/chatlan-project.zip -d chatlan
+          test -f chatlan/app/google-services.json
+          test -f chatlan/app/src/main/AndroidManifest.xml
+
+      - name: Install Android 35 tools
+        shell: bash
+        run: |
+          set -euxo pipefail
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'platform-tools'
+
+      - name: Build unsigned release APK
+        working-directory: chatlan
+        shell: bash
+        run: |
+          set -euxo pipefail
+          gradle :app:assembleRelease --stacktrace
+          test -f app/build/outputs/apk/release/app-release-unsigned.apk
+
+      - name: Validate unsigned APK and collect signing tools
+        shell: bash
+        run: |
+          set -euxo pipefail
+          BT="$ANDROID_HOME/build-tools/35.0.0"
+          APK="chatlan/app/build/outputs/apk/release/app-release-unsigned.apk"
+          "$BT/aapt" dump badging "$APK" | tee /tmp/badging.txt
+          grep "package: name='com.chatlan.app'" /tmp/badging.txt
+          grep "versionCode='9'" /tmp/badging.txt
+          grep "sdkVersion:'23'" /tmp/badging.txt
+          mkdir -p out/build-tools-35.0.0/lib
+          cp "$APK" out/ChatLAN_Android_v9_UNSIGNED.apk
+          cp "$BT/apksigner" out/build-tools-35.0.0/apksigner
+          cp "$BT/lib/apksigner.jar" out/build-tools-35.0.0/lib/apksigner.jar
+          cp "$BT/zipalign" out/build-tools-35.0.0/zipalign
+          cp "$BT/aapt" out/build-tools-35.0.0/aapt
+          cp /tmp/badging.txt out/android-badging.txt
+
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: ChatLAN-Android-v9-build
+          path: out/
+          if-no-files-found: error
+          retention-days: 1
