@@ -1,0 +1,20 @@
+name: Probe Build 5.7
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/probe57-temp.yml]
+permissions:
+  contents: write
+  actions: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Record latest build57 run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sleep 8
+          DATA=$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/build-sistema-notas-57-native-drag.yml/runs?per_page=3")
+          CONTENT=$(printf '%s' "$DATA" | base64 -w0)
+          jq -n --arg message '[skip ci] probe build57' --arg content "$CONTENT" --arg branch main '{message:$message,content:$content,branch:$branch}' | gh api --method PUT -H 'Accept: application/vnd.github+json' "repos/${GITHUB_REPOSITORY}/contents/.build57-probe.json" --input -
