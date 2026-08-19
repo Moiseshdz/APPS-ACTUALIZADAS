@@ -1,0 +1,11 @@
+{
+  "name": "sistema-notas-escritorio",
+  "version": "5.5.0",
+  "private": true,
+  "description": "Sistema de Notas con interfaz original y Chromium autocontenido",
+  "main": "supervisor.js",
+  "devDependencies": {
+    "electron": "43.3.0",
+    "electron-builder": "26.0.12"
+  }
+}
