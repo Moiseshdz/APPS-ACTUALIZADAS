@@ -1,0 +1,18 @@
+name: Temporary Actions Probe
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/probe-actions-temp.yml]
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Record Actions availability
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          JSON="{\"ok\":true,\"run_id\":${GITHUB_RUN_ID}}"
+          CONTENT=$(printf '%s' "$JSON" | base64 -w0)
+          jq -n --arg message '[skip ci] Actions probe' --arg content "$CONTENT" --arg branch main '{message:$message,content:$content,branch:$branch}' | gh api --method PUT -H 'Accept: application/vnd.github+json' "repos/${GITHUB_REPOSITORY}/contents/.actions-probe.json" --input -
