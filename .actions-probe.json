@@ -1,4 +1,4 @@
 {
-  "probe_run_id": "32309816619",
-  "build_runs_raw": "failed to determine base repo: failed to run git: fatal: not a git repository (or any of the parent directories): .git"
+  "probe_run_id": "32309854429",
+  "build_runs_raw": "[{\"conclusion\":\"\",\"createdAt\":\"2026-08-19T22:35:37Z\",\"databaseId\":32309519300,\"headSha\":\"bf152b8484c5964690131b97f3f5aae123002e42\",\"status\":\"in_progress\",\"updatedAt\":\"2026-08-19T22:35:40Z\",\"url\":\"https://github.com/Moiseshdz/APPS-ACTUALIZADAS/actions/runs/32309519300\"}]"
 }
