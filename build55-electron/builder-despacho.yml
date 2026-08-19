@@ -1,0 +1,20 @@
+appId: mx.chiapas.sistemanotas.despacho
+productName: APP DESPACHO
+directories:
+  output: dist-despacho
+files:
+  - common.js
+  - despacho.js
+  - package.json
+extraMetadata:
+  main: despacho.js
+asar: true
+win:
+  target:
+    - target: portable
+      arch:
+        - x64
+  artifactName: APP DESPACHO.exe
+  signAndEditExecutable: false
+portable:
+  artifactName: APP DESPACHO.exe
