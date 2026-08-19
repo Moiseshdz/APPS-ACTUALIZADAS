@@ -1,0 +1,23 @@
+appId: mx.chiapas.sistemanotas.supervisor
+productName: APP SUPERVISOR
+directories:
+  output: dist-supervisor
+files:
+  - common.js
+  - supervisor.js
+  - package.json
+extraMetadata:
+  main: supervisor.js
+extraResources:
+  - from: ../backend.exe
+    to: backend.exe
+asar: true
+win:
+  target:
+    - target: portable
+      arch:
+        - x64
+  artifactName: APP SUPERVISOR.exe
+  signAndEditExecutable: false
+portable:
+  artifactName: APP SUPERVISOR.exe
