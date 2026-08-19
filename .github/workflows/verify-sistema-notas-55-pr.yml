@@ -1,0 +1,69 @@
+name: Verify Sistema Notas 5.5 on Windows
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  verify:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Dispatch self-contained Windows build
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $before = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+          gh workflow run build-sistema-notas-55.yml --ref build-sistema-notas-5-5-self-contained
+          $runId = $null
+          for ($i=0; $i -lt 80; $i++) {
+            Start-Sleep -Seconds 5
+            $runs = gh run list --workflow build-sistema-notas-55.yml --branch build-sistema-notas-5-5-self-contained --limit 20 --json databaseId,createdAt,status,conclusion | ConvertFrom-Json
+            foreach ($r in $runs) {
+              $created = [DateTimeOffset]::Parse($r.createdAt).ToUnixTimeSeconds()
+              if ($created -ge ($before - 5)) { $runId = $r.databaseId; break }
+            }
+            if ($runId) { break }
+          }
+          if (-not $runId) { throw 'No se encontró la compilación de Windows.' }
+          "BUILD_RUN_ID=$runId" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          gh run watch $runId --exit-status
+
+      - name: Download compiled EXE files
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Force -Path verified | Out-Null
+          gh run download $env:BUILD_RUN_ID -n SISTEMA_NOTAS_5_5_DOS_EXE -D verified
+          $files = Get-ChildItem verified -File
+          if ($files.Count -ne 2) { throw "Se esperaban exactamente 2 archivos y llegaron $($files.Count)." }
+          $names = $files.Name | Sort-Object
+          if (($names -notcontains 'APP SUPERVISOR.exe') -or ($names -notcontains 'APP DESPACHO.exe')) { throw 'Los nombres de los EXE no son los esperados.' }
+          foreach ($f in $files) {
+            if ($f.Length -lt 50000000) { throw "$($f.Name) es demasiado pequeño para contener Chromium autocontenido." }
+            Get-FileHash $f.FullName -Algorithm SHA256 | Format-List
+          }
+
+      - name: Upload verified pair
+        uses: actions/upload-artifact@v4
+        with:
+          name: SISTEMA_NOTAS_5_5_VERIFICADO_WINDOWS
+          path: |
+            verified/APP SUPERVISOR.exe
+            verified/APP DESPACHO.exe
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
