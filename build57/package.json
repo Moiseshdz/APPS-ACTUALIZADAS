@@ -1,0 +1,9 @@
+{
+  "name": "sistema-notas-57",
+  "version": "5.7.0",
+  "private": true,
+  "devDependencies": {
+    "electron": "43.3.0",
+    "electron-builder": "26.0.12"
+  }
+}
