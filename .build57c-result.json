@@ -1,0 +1,17 @@
+{
+  "ok": true,
+  "run_id": 32316185842,
+  "artifact_id": 9388333217,
+  "manifest": {
+    "hashes": {
+      "APP SERVIDOR.exe": "5aaf9171d6799d7f328900bfc1103ed69f95cbda736edcc6471d027c68eecb00",
+      "APP DESPACHO.exe": "a27616578013670fb4510410959cd5903e4458710c6f2c3dbaa4d62c4deb7e42",
+      "APP SUPERVISOR.exe": "c2b10251d0bbb91e9742e17e47244a024c717ba6bed8dbe9a475ba5f4c63df5f"
+    },
+    "sizes": {
+      "APP SERVIDOR.exe": 95071902,
+      "APP DESPACHO.exe": 95221237,
+      "APP SUPERVISOR.exe": 95220990
+    }
+  }
+}
