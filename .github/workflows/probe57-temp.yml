@@ -14,11 +14,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          sleep 20
+          sleep 25
           DATA=$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/build-sistema-notas-57b-native-drag.yml/runs?per_page=3")
           CONTENT=$(printf '%s' "$DATA" | base64 -w0)
-          if gh api "repos/${GITHUB_REPOSITORY}/contents/.build57b-probe.json" >/dev/null 2>&1; then
-            SHA=$(gh api "repos/${GITHUB_REPOSITORY}/contents/.build57b-probe.json" --jq .sha)
+          SHA=$(gh api "repos/${GITHUB_REPOSITORY}/contents/.build57b-probe.json" --jq .sha 2>/dev/null || true)
+          if [ -n "$SHA" ]; then
             jq -n --arg message '[skip ci] probe build57b' --arg content "$CONTENT" --arg branch main --arg sha "$SHA" '{message:$message,content:$content,branch:$branch,sha:$sha}' | gh api --method PUT -H 'Accept: application/vnd.github+json' "repos/${GITHUB_REPOSITORY}/contents/.build57b-probe.json" --input -
           else
             jq -n --arg message '[skip ci] probe build57b' --arg content "$CONTENT" --arg branch main '{message:$message,content:$content,branch:$branch}' | gh api --method PUT -H 'Accept: application/vnd.github+json' "repos/${GITHUB_REPOSITORY}/contents/.build57b-probe.json" --input -
