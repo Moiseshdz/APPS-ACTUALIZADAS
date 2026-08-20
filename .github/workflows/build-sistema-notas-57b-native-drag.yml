@@ -21,7 +21,7 @@ jobs:
           go-version: '1.24.x'
       - name: Patch interface and build backend
         shell: pwsh
-        run: ./build57/patch-and-build-v2.ps1
+        run: ./build57/patch-and-build-v3.ps1
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
