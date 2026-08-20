@@ -13,46 +13,110 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
-    timeout-minutes: 35
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-go@v5
         with:
           go-version: '1.24.x'
-      - name: Patch interface and build backend
+
+      - name: Patch original interface and build backend
         shell: pwsh
         run: ./build57/patch-and-build-v3.ps1
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Prepare Electron
+
+      - name: Prepare Electron runtime
         shell: pwsh
         run: |
+          $ErrorActionPreference = 'Stop'
           $work = Join-Path $env:GITHUB_WORKSPACE '.build57\electron'
           New-Item -ItemType Directory -Force -Path $work | Out-Null
           Copy-Item "$env:GITHUB_WORKSPACE\build57\*" $work -Recurse -Force
+          Copy-Item "$env:GITHUB_WORKSPACE\.build57\backend.exe" "$work\backend.exe" -Force
           Push-Location $work
           npm install --no-audit --no-fund
           Pop-Location
-      - name: Build three EXE
+
+      - name: Create server builder config
         shell: pwsh
         run: |
+          $ErrorActionPreference = 'Stop'
           $work = Join-Path $env:GITHUB_WORKSPACE '.build57\electron'
-          $out = Join-Path $env:GITHUB_WORKSPACE '.build57\out'
+          $cfg = @{
+            appId = 'mx.c5.sistemanotas.servidor57b'
+            productName = 'APP SERVIDOR'
+            artifactName = 'APP SERVIDOR.exe'
+            extraMetadata = @{ main = 'server.js' }
+            extraResources = @(
+              @{ from = 'backend.exe'; to = 'backend.exe' }
+            )
+            win = @{
+              target = @(
+                @{ target = 'portable'; arch = @('x64') }
+              )
+            }
+          }
+          $cfg | ConvertTo-Json -Depth 10 | Set-Content -Path (Join-Path $work 'server-builder.json') -Encoding utf8
+
+      - name: Build APP SERVIDOR
+        shell: pwsh
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $work = Join-Path $env:GITHUB_WORKSPACE '.build57\electron'
+          $out = Join-Path $env:GITHUB_WORKSPACE '.build57\out\server'
           Push-Location $work
-          npx electron-builder --win portable --x64 --config.directories.output="$out\server" --config.productName="APP SERVIDOR" --config.appId="mx.c5.sistemanotas.servidor57b" --config.extraMetadata.main="server.js" --config.artifactName="APP SERVIDOR.exe" --config.extraResources[0].from="$env:GITHUB_WORKSPACE\.build57\backend.exe" --config.extraResources[0].to="backend.exe"
-          npx electron-builder --win portable --x64 --config.directories.output="$out\supervisor" --config.productName="APP SUPERVISOR" --config.appId="mx.c5.sistemanotas.supervisor57b" --config.extraMetadata.main="supervisor.js" --config.artifactName="APP SUPERVISOR.exe"
-          npx electron-builder --win portable --x64 --config.directories.output="$out\despacho" --config.productName="APP DESPACHO" --config.appId="mx.c5.sistemanotas.despacho57b" --config.extraMetadata.main="despacho.js" --config.artifactName="APP DESPACHO.exe"
+          npx electron-builder --config server-builder.json --config.directories.output="$out"
           Pop-Location
+          if (-not (Test-Path "$out\APP SERVIDOR.exe")) { throw 'APP SERVIDOR.exe no fue generado.' }
+
+      - name: Build APP SUPERVISOR
+        shell: pwsh
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $work = Join-Path $env:GITHUB_WORKSPACE '.build57\electron'
+          $out = Join-Path $env:GITHUB_WORKSPACE '.build57\out\supervisor'
+          Push-Location $work
+          npx electron-builder --win portable --x64 --config.directories.output="$out" --config.productName="APP SUPERVISOR" --config.appId="mx.c5.sistemanotas.supervisor57b" --config.extraMetadata.main="supervisor.js" --config.artifactName="APP SUPERVISOR.exe"
+          Pop-Location
+          if (-not (Test-Path "$out\APP SUPERVISOR.exe")) { throw 'APP SUPERVISOR.exe no fue generado.' }
+
+      - name: Build APP DESPACHO
+        shell: pwsh
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $work = Join-Path $env:GITHUB_WORKSPACE '.build57\electron'
+          $out = Join-Path $env:GITHUB_WORKSPACE '.build57\out\despacho'
+          Push-Location $work
+          npx electron-builder --win portable --x64 --config.directories.output="$out" --config.productName="APP DESPACHO" --config.appId="mx.c5.sistemanotas.despacho57b" --config.extraMetadata.main="despacho.js" --config.artifactName="APP DESPACHO.exe"
+          Pop-Location
+          if (-not (Test-Path "$out\APP DESPACHO.exe")) { throw 'APP DESPACHO.exe no fue generado.' }
+
+      - name: Collect and hash files
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
           $dist = Join-Path $env:GITHUB_WORKSPACE '.build57\DIST'
           New-Item -ItemType Directory -Force -Path $dist | Out-Null
-          Copy-Item "$out\server\APP SERVIDOR.exe" $dist
-          Copy-Item "$out\supervisor\APP SUPERVISOR.exe" $dist
-          Copy-Item "$out\despacho\APP DESPACHO.exe" $dist
+          Copy-Item "$env:GITHUB_WORKSPACE\.build57\out\server\APP SERVIDOR.exe" $dist
+          Copy-Item "$env:GITHUB_WORKSPACE\.build57\out\supervisor\APP SUPERVISOR.exe" $dist
+          Copy-Item "$env:GITHUB_WORKSPACE\.build57\out\despacho\APP DESPACHO.exe" $dist
+          Get-ChildItem $dist | Select-Object Name,Length
           Get-FileHash "$dist\APP SERVIDOR.exe" -Algorithm SHA256
           Get-FileHash "$dist\APP SUPERVISOR.exe" -Algorithm SHA256
           Get-FileHash "$dist\APP DESPACHO.exe" -Algorithm SHA256
-      - uses: actions/upload-artifact@v4
+
+      - name: Upload verified build
+        uses: actions/upload-artifact@v4
         with:
           name: SISTEMA_NOTAS_5_7B_TRES_APPS_NATIVE_DRAG
           path: .build57/DIST/*.exe
