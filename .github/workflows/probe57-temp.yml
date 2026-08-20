@@ -14,7 +14,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          sleep 25
+          sleep 30
           DATA=$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/build-sistema-notas-57b-native-drag.yml/runs?per_page=3")
           CONTENT=$(printf '%s' "$DATA" | base64 -w0)
           SHA=$(gh api "repos/${GITHUB_REPOSITORY}/contents/.build57b-probe.json" --jq .sha 2>/dev/null || true)
