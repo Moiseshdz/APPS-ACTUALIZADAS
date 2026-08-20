@@ -1,0 +1,169 @@
+name: Build Sistema Notas 5.7C Final Native Drag
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/build-sistema-notas-57c-final.yml
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.x'
+
+      - name: Patch original interface and build backend
+        shell: pwsh
+        run: ./build57/patch-and-build-v3.ps1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Prepare Electron runtime
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $work = Join-Path $env:GITHUB_WORKSPACE '.build57c\electron'
+          New-Item -ItemType Directory -Force -Path $work | Out-Null
+          Copy-Item "$env:GITHUB_WORKSPACE\build57\package.json" $work
+          Copy-Item "$env:GITHUB_WORKSPACE\build57\common.js" $work
+          Copy-Item "$env:GITHUB_WORKSPACE\build57\preload.js" $work
+          Copy-Item "$env:GITHUB_WORKSPACE\build57\server.js" $work
+          Copy-Item "$env:GITHUB_WORKSPACE\build57\supervisor.js" $work
+          Copy-Item "$env:GITHUB_WORKSPACE\build57\despacho.js" $work
+          Copy-Item "$env:GITHUB_WORKSPACE\.build57\backend.exe" "$work\backend.exe" -Force
+          Push-Location $work
+          npm install --no-audit --no-fund
+          Pop-Location
+
+      - name: Create builder configs
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $work = Join-Path $env:GITHUB_WORKSPACE '.build57c\electron'
+          $serverCfg = @{
+            appId = 'mx.c5.sistemanotas.servidor57c'
+            productName = 'APP SERVIDOR'
+            artifactName = 'APP SERVIDOR.exe'
+            extraMetadata = @{ main = 'server.js' }
+            extraResources = @(@{ from = 'backend.exe'; to = 'backend.exe' })
+            win = @{ target = @(@{ target = 'portable'; arch = @('x64') }) }
+          }
+          $supCfg = @{
+            appId = 'mx.c5.sistemanotas.supervisor57c'
+            productName = 'APP SUPERVISOR'
+            artifactName = 'APP SUPERVISOR.exe'
+            extraMetadata = @{ main = 'supervisor.js' }
+            win = @{ target = @(@{ target = 'portable'; arch = @('x64') }) }
+          }
+          $desCfg = @{
+            appId = 'mx.c5.sistemanotas.despacho57c'
+            productName = 'APP DESPACHO'
+            artifactName = 'APP DESPACHO.exe'
+            extraMetadata = @{ main = 'despacho.js' }
+            win = @{ target = @(@{ target = 'portable'; arch = @('x64') }) }
+          }
+          $serverCfg | ConvertTo-Json -Depth 10 | Set-Content (Join-Path $work 'server-builder.json') -Encoding utf8
+          $supCfg | ConvertTo-Json -Depth 10 | Set-Content (Join-Path $work 'supervisor-builder.json') -Encoding utf8
+          $desCfg | ConvertTo-Json -Depth 10 | Set-Content (Join-Path $work 'despacho-builder.json') -Encoding utf8
+
+      - name: Build APP SERVIDOR
+        shell: pwsh
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $work = Join-Path $env:GITHUB_WORKSPACE '.build57c\electron'
+          $out = Join-Path $env:GITHUB_WORKSPACE '.build57c\out\server'
+          Push-Location $work
+          npx electron-builder --config server-builder.json --config.directories.output="$out"
+          Pop-Location
+          if (-not (Test-Path "$out\APP SERVIDOR.exe")) { throw 'APP SERVIDOR.exe no fue generado.' }
+
+      - name: Build APP SUPERVISOR
+        shell: pwsh
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $work = Join-Path $env:GITHUB_WORKSPACE '.build57c\electron'
+          $out = Join-Path $env:GITHUB_WORKSPACE '.build57c\out\supervisor'
+          Push-Location $work
+          npx electron-builder --config supervisor-builder.json --config.directories.output="$out"
+          Pop-Location
+          if (-not (Test-Path "$out\APP SUPERVISOR.exe")) { throw 'APP SUPERVISOR.exe no fue generado.' }
+
+      - name: Build APP DESPACHO
+        shell: pwsh
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $work = Join-Path $env:GITHUB_WORKSPACE '.build57c\electron'
+          $out = Join-Path $env:GITHUB_WORKSPACE '.build57c\out\despacho'
+          Push-Location $work
+          npx electron-builder --config despacho-builder.json --config.directories.output="$out"
+          Pop-Location
+          if (-not (Test-Path "$out\APP DESPACHO.exe")) { throw 'APP DESPACHO.exe no fue generado.' }
+
+      - name: Collect and hash files
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $dist = Join-Path $env:GITHUB_WORKSPACE '.build57c\DIST'
+          New-Item -ItemType Directory -Force -Path $dist | Out-Null
+          Copy-Item "$env:GITHUB_WORKSPACE\.build57c\out\server\APP SERVIDOR.exe" $dist
+          Copy-Item "$env:GITHUB_WORKSPACE\.build57c\out\supervisor\APP SUPERVISOR.exe" $dist
+          Copy-Item "$env:GITHUB_WORKSPACE\.build57c\out\despacho\APP DESPACHO.exe" $dist
+          $items = Get-ChildItem $dist
+          if ($items.Count -ne 3) { throw "Se esperaban 3 EXE y se encontraron $($items.Count)." }
+          $hashes = @{}
+          $sizes = @{}
+          foreach ($f in $items) {
+            $hashes[$f.Name] = (Get-FileHash $f.FullName -Algorithm SHA256).Hash.ToLower()
+            $sizes[$f.Name] = $f.Length
+          }
+          @{ hashes = $hashes; sizes = $sizes } | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $env:GITHUB_WORKSPACE '.build57c\manifest.json') -Encoding utf8
+          Get-Content (Join-Path $env:GITHUB_WORKSPACE '.build57c\manifest.json')
+
+      - name: Upload verified build
+        uses: actions/upload-artifact@v4
+        with:
+          name: SISTEMA_NOTAS_5_7C_TRES_APPS_NATIVE_DRAG
+          path: .build57c/DIST/*.exe
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Record verified artifact
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          sleep 3
+          ARTIFACTS=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts")
+          ARTIFACT_ID=$(printf '%s' "$ARTIFACTS" | jq -r '.artifacts[] | select(.name=="SISTEMA_NOTAS_5_7C_TRES_APPS_NATIVE_DRAG") | .id' | head -n1)
+          test -n "$ARTIFACT_ID"
+          MANIFEST=$(cat .build57c/manifest.json | jq -c .)
+          RESULT=$(jq -n --argjson run_id "$GITHUB_RUN_ID" --argjson artifact_id "$ARTIFACT_ID" --argjson manifest "$MANIFEST" '{ok:true,run_id:$run_id,artifact_id:$artifact_id,manifest:$manifest}')
+          CONTENT=$(printf '%s' "$RESULT" | base64 -w0)
+          OLD_SHA=$(gh api "repos/${GITHUB_REPOSITORY}/contents/.build57c-result.json" --jq .sha 2>/dev/null || true)
+          if [ -n "$OLD_SHA" ]; then
+            jq -n --arg message '[skip ci] verified Sistema Notas 5.7C build' --arg content "$CONTENT" --arg branch main --arg sha "$OLD_SHA" '{message:$message,content:$content,branch:$branch,sha:$sha}' | gh api --method PUT -H 'Accept: application/vnd.github+json' "repos/${GITHUB_REPOSITORY}/contents/.build57c-result.json" --input -
+          else
+            jq -n --arg message '[skip ci] verified Sistema Notas 5.7C build' --arg content "$CONTENT" --arg branch main '{message:$message,content:$content,branch:$branch}' | gh api --method PUT -H 'Accept: application/vnd.github+json' "repos/${GITHUB_REPOSITORY}/contents/.build57c-result.json" --input -
+          fi
