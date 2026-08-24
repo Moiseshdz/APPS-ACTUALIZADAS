@@ -1,10 +1,11 @@
-name: ChatLAN Android v12 Build
+name: ChatLAN Android v13 Build
 
 on:
   push:
     branches: ["chatlan-v11-whatsapp-features"]
     paths:
       - '.chatlan_build/patch_v12.py'
+      - '.chatlan_build/patch_v13_extra.py'
       - '.github/workflows/chatlan-v11-build.yml'
   pull_request:
     branches: ["main"]
@@ -29,7 +30,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
-      - name: Prepare v12 project
+      - name: Prepare v13 project
         shell: bash
         run: |
           set -euxo pipefail
@@ -39,9 +40,11 @@ jobs:
           echo "c09905f4fdb495f5122352f6c8cedc05a181d37cf58c3b0d2db8b909bc21f46b  /tmp/chatlan-project.zip" | sha256sum -c -
           unzip -q /tmp/chatlan-project.zip -d /tmp/chatlan
           python .chatlan_build/patch_v12.py
-          grep "versionCode 12" /tmp/chatlan/chat_lan_v11_project/app/build.gradle
-          grep "APP_VERSION_CODE=12" /tmp/chatlan/chat_lan_v11_project/app/src/main/assets/index.html
-          grep "setAllowUniversalAccessFromFileURLs(true)" /tmp/chatlan/chat_lan_v11_project/app/src/main/java/com/chatlan/app/MainActivity.java
+          python .chatlan_build/patch_v13_extra.py
+          grep "versionCode 13" /tmp/chatlan/chat_lan_v11_project/app/build.gradle
+          grep "APP_VERSION_CODE=13" /tmp/chatlan/chat_lan_v11_project/app/src/main/assets/index.html
+          grep "SUPABASE_URL='https://mowzkwpdqhnkvruhxbts.supabase.co'" /tmp/chatlan/chat_lan_v11_project/app/src/main/assets/index.html
+          ! grep -q "firebase-storage.js" /tmp/chatlan/chat_lan_v11_project/app/src/main/assets/index.html
           python - <<'PY'
           from pathlib import Path
           t=Path('/tmp/chatlan/chat_lan_v11_project/app/src/main/assets/index.html').read_text()
@@ -65,9 +68,9 @@ jobs:
           APK="/tmp/chatlan/chat_lan_v11_project/app/build/outputs/apk/release/app-release-unsigned.apk"
           "$BT/aapt" dump badging "$APK" | tee /tmp/badging.txt
           grep "package: name='com.chatlan.app'" /tmp/badging.txt
-          grep "versionCode='12'" /tmp/badging.txt
+          grep "versionCode='13'" /tmp/badging.txt
           mkdir -p out/build-tools-35.0.0/lib
-          cp "$APK" out/ChatLAN_Android_v12_UNSIGNED.apk
+          cp "$APK" out/ChatLAN_Android_v13_UNSIGNED.apk
           cp "$BT/apksigner" out/build-tools-35.0.0/apksigner
           cp "$BT/lib/apksigner.jar" out/build-tools-35.0.0/lib/apksigner.jar
           cp "$BT/zipalign" out/build-tools-35.0.0/zipalign
@@ -75,6 +78,6 @@ jobs:
           cp /tmp/badging.txt out/android-badging.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: ChatLAN-Android-v12-build
+          name: ChatLAN-Android-v13-build
           path: out/
           retention-days: 1
