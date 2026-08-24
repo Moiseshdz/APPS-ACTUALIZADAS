@@ -28,6 +28,9 @@ jobs:
           unzip -q /tmp/chatlan-project.zip -d /tmp/chatlan
           python .chatlan_build/patch_v12.py
           python .chatlan_build/patch_v13_extra.py
+          grep "versionCode 13" /tmp/chatlan/chat_lan_v11_project/app/build.gradle
+          grep "APP_VERSION_CODE=13" /tmp/chatlan/chat_lan_v11_project/app/src/main/assets/index.html
+          ! grep -q "firebase-storage.js" /tmp/chatlan/chat_lan_v11_project/app/src/main/assets/index.html
       - name: Install Android tools
         run: |
           yes | sdkmanager --licenses >/dev/null || true
