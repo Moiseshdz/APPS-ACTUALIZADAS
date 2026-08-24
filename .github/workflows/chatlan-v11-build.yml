@@ -1,0 +1,62 @@
+name: ChatLAN Android v11 Build
+
+on:
+  push:
+    branches: ["chatlan-v11-whatsapp-features"]
+    paths:
+      - '.chatlan_build/**'
+      - '.github/workflows/chatlan-v11-build.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Prepare project
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p /tmp/chatlan
+          unzip -q .chatlan_build/project.zip -d /tmp/chatlan
+          test -f /tmp/chatlan/chat_lan_v11_project/app/build.gradle
+      - name: Install Android tools
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'platform-tools'
+      - name: Build
+        working-directory: /tmp/chatlan/chat_lan_v11_project
+        run: |
+          gradle :app:assembleRelease --stacktrace
+          test -f app/build/outputs/apk/release/app-release-unsigned.apk
+      - name: Validate
+        run: |
+          set -euxo pipefail
+          BT="$ANDROID_HOME/build-tools/35.0.0"
+          APK="/tmp/chatlan/chat_lan_v11_project/app/build/outputs/apk/release/app-release-unsigned.apk"
+          "$BT/aapt" dump badging "$APK" | tee /tmp/badging.txt
+          grep "package: name='com.chatlan.app'" /tmp/badging.txt
+          grep "versionCode='11'" /tmp/badging.txt
+          mkdir -p out/build-tools-35.0.0/lib
+          cp "$APK" out/ChatLAN_Android_v11_UNSIGNED.apk
+          cp "$BT/apksigner" out/build-tools-35.0.0/apksigner
+          cp "$BT/lib/apksigner.jar" out/build-tools-35.0.0/lib/apksigner.jar
+          cp "$BT/zipalign" out/build-tools-35.0.0/zipalign
+          cp "$BT/aapt" out/build-tools-35.0.0/aapt
+          cp /tmp/badging.txt out/android-badging.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ChatLAN-Android-v11-build
+          path: out/
+          retention-days: 1
