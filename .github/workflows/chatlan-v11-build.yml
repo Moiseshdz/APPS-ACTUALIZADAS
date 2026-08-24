@@ -34,7 +34,18 @@ jobs:
         run: |
           set -euxo pipefail
           mkdir -p /tmp/chatlan
-          unzip -q .chatlan_build/project.zip -d /tmp/chatlan
+          wc -c .chatlan_build/project.zip
+          sha256sum .chatlan_build/project.zip
+          xxd -l 16 .chatlan_build/project.zip
+          if head -c 4 .chatlan_build/project.zip | grep -q '^UEsD'; then
+            base64 -d .chatlan_build/project.zip > /tmp/chatlan-project.zip
+          else
+            cp .chatlan_build/project.zip /tmp/chatlan-project.zip
+          fi
+          wc -c /tmp/chatlan-project.zip
+          sha256sum /tmp/chatlan-project.zip
+          unzip -t /tmp/chatlan-project.zip
+          unzip -q /tmp/chatlan-project.zip -d /tmp/chatlan
           test -f /tmp/chatlan/chat_lan_v11_project/app/build.gradle
       - name: Install Android tools
         run: |
