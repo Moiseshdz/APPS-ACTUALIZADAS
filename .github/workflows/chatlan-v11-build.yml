@@ -6,6 +6,11 @@ on:
     paths:
       - '.chatlan_build/**'
       - '.github/workflows/chatlan-v11-build.yml'
+  pull_request:
+    branches: ["main"]
+    paths:
+      - '.chatlan_build/**'
+      - '.github/workflows/chatlan-v11-build.yml'
   workflow_dispatch:
 
 permissions:
