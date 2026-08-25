@@ -1,6 +1,11 @@
-name: ChatLAN Android v13 Build
+name: ChatLAN Android v14 Build
 
 on:
+  push:
+    branches: ["chatlan-v11-whatsapp-features"]
+    paths:
+      - '.chatlan_build/patch_v14_login_fix.py'
+      - '.github/workflows/chatlan-v11-build.yml'
   workflow_dispatch:
 
 permissions:
@@ -19,7 +24,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
-      - name: Prepare v13 project
+      - name: Prepare v14 project
         shell: bash
         run: |
           set -euxo pipefail
@@ -28,10 +33,41 @@ jobs:
           unzip -q /tmp/chatlan-project.zip -d /tmp/chatlan
           python .chatlan_build/patch_v12.py
           python .chatlan_build/patch_v13_extra.py
+          python .chatlan_build/patch_v14_login_fix.py
+          grep "versionCode 14" /tmp/chatlan/chat_lan_v11_project/app/build.gradle
+          grep "APP_VERSION_CODE=14" /tmp/chatlan/chat_lan_v11_project/app/src/main/assets/index.html
+          ! grep -F "}catch{return''}}" /tmp/chatlan/chat_lan_v11_project/app/src/main/assets/index.html
+          python - <<'PY'
+          from pathlib import Path
+          t=Path('/tmp/chatlan/chat_lan_v11_project/app/src/main/assets/index.html').read_text()
+          s=t.rfind('<script type="module">'); e=t.rfind('</script>')
+          Path('/tmp/chatlan/index.js').write_text(t[s+len('<script type="module">'):e])
+          PY
+          node --check /tmp/chatlan/index.js
       - name: Install Android tools
         run: |
           yes | sdkmanager --licenses >/dev/null || true
           sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'platform-tools'
       - name: Build
         working-directory: /tmp/chatlan/chat_lan_v11_project
-        run: gradle :app:assembleRelease --stacktrace
+        run: |
+          gradle :app:assembleRelease --stacktrace
+          test -f app/build/outputs/apk/release/app-release-unsigned.apk
+      - name: Validate and package
+        run: |
+          set -euxo pipefail
+          BT="$ANDROID_HOME/build-tools/35.0.0"
+          APK="/tmp/chatlan/chat_lan_v11_project/app/build/outputs/apk/release/app-release-unsigned.apk"
+          "$BT/aapt" dump badging "$APK" | tee /tmp/badging.txt
+          grep "package: name='com.chatlan.app'" /tmp/badging.txt
+          grep "versionCode='14'" /tmp/badging.txt
+          mkdir -p out/build-tools-35.0.0/lib
+          cp "$APK" out/ChatLAN_Android_v14_UNSIGNED.apk
+          cp "$BT/apksigner" out/build-tools-35.0.0/apksigner
+          cp "$BT/lib/apksigner.jar" out/build-tools-35.0.0/lib/apksigner.jar
+          cp /tmp/badging.txt out/android-badging.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ChatLAN-Android-v14-build
+          path: out/
+          retention-days: 1
