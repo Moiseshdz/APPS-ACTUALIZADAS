@@ -43,7 +43,10 @@ jobs:
           grep "versionCode 15" /tmp/chatlan/chat_lan_v11_project/app/build.gradle
           grep "APP_VERSION_CODE=15" /tmp/chatlan/chat_lan_v11_project/app/src/main/assets/index.html
           grep -F "html.chatlanAndroid .side.open" /tmp/chatlan/chat_lan_v11_project/app/src/main/assets/index.html
-          grep -F "$('menuBtn').ontouchend=sideToggleEvent" /tmp/chatlan/chat_lan_v11_project/app/src/main/assets/index.html
+          grep -F "function closeSide()" /tmp/chatlan/chat_lan_v11_project/app/src/main/assets/index.html
+          grep -F "function toggleSide()" /tmp/chatlan/chat_lan_v11_project/app/src/main/assets/index.html
+          grep -F "function toggles()" /tmp/chatlan/chat_lan_v11_project/app/src/main/assets/index.html
+          grep -F "$('menuBtn').ontouchend=" /tmp/chatlan/chat_lan_v11_project/app/src/main/assets/index.html
           python - <<'PY'
           from pathlib import Path
           t=Path('/tmp/chatlan/chat_lan_v11_project/app/src/main/assets/index.html').read_text()
