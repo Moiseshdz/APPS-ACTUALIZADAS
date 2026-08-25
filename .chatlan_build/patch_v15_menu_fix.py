@@ -27,11 +27,20 @@ if android_mark not in t:
     if script_marker not in t: raise SystemExit('No se encontró script module')
     t=t.replace(script_marker,script_marker+'\n'+android_mark,1)
 
-# La lógica closeSide/toggleSide original ya agrega/quita .open/.show. No la reescribimos.
-if "function toggleSide()" not in t or "function closeSide()" not in t:
-    raise SystemExit('No se encontraron funciones del menú lateral')
+# v14 eliminó accidentalmente estas funciones al recortar el bloque publishUpdate -> syncNativePush.
+# Las restauramos antes de los manejadores de botones para que el menú y los toggles vuelvan a existir.
+restore="""
+function closeSide(){$('side').classList.remove('open');$('sideBackdrop').classList.remove('show')}
+function toggleSide(){let open=!$('side').classList.contains('open');$('side').classList.toggle('open',open);$('sideBackdrop').classList.toggle('show',open)}
+function toggles(){$('soundBtn').classList.toggle('on',soundOn);$('notifBtn').classList.toggle('on',notifOn)}
+"""
+if "function closeSide()" not in t or "function toggleSide()" not in t or "function toggles()" not in t:
+    anchor='stickers.forEach(st=>'
+    pos=t.find(anchor)
+    if pos<0: raise SystemExit('No se encontró punto para restaurar menú lateral')
+    t=t[:pos]+restore+t[pos:]
 
-# Refuerza eventos táctiles sin depender de click de WebView.
+# Refuerza eventos táctiles sin depender solamente del click de WebView.
 menu_click="$('menuBtn').onclick=toggleSide;"
 close_click="$('sideClose').onclick=closeSide;"
 back_click="$('sideBackdrop').onclick=closeSide;"
@@ -54,12 +63,14 @@ t=t.replace("window.addEventListener('resize',()=>{if(window.innerWidth>780)clos
 t=re.sub(r"const APP_PLATFORM='android',APP_VERSION_CODE=\d+,APP_VERSION_NAME='[^']+';",
          "const APP_PLATFORM='android',APP_VERSION_CODE=15,APP_VERSION_NAME='15.0';",t,count=1)
 
-# Validaciones de regresión.
+# Validaciones de regresión: el módulo debe contener las funciones que v14 perdió.
 assert "APP_VERSION_CODE=15" in t
 assert "html.chatlanAndroid .side.open" in t
 assert "document.documentElement.classList.add('chatlanAndroid')" in t
 assert "$('menuBtn').ontouchend=" in t
+assert "function closeSide()" in t
 assert "function toggleSide()" in t
+assert "function toggles()" in t
 
 htmlp.write_text(t,encoding='utf-8')
 
